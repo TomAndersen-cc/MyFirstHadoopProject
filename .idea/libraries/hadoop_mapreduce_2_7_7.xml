@@ -1,0 +1,19 @@
+<component name="libraryTable">
+  <library name="hadoop-mapreduce-2.7.7">
+    <CLASSES>
+      <root url="jar://C:/hadoop-2.7.7/share/hadoop/mapreduce/hadoop-mapreduce-client-hs-plugins-2.7.7.jar!/" />
+      <root url="jar://C:/hadoop-2.7.7/share/hadoop/mapreduce/hadoop-mapreduce-client-app-2.7.7.jar!/" />
+      <root url="jar://C:/hadoop-2.7.7/share/hadoop/mapreduce/hadoop-mapreduce-client-hs-2.7.7.jar!/" />
+      <root url="jar://C:/hadoop-2.7.7/share/hadoop/mapreduce/hadoop-mapreduce-client-common-2.7.7.jar!/" />
+      <root url="jar://C:/hadoop-2.7.7/share/hadoop/mapreduce/hadoop-mapreduce-client-jobclient-2.7.7-tests.jar!/" />
+      <root url="jar://C:/hadoop-2.7.7/share/hadoop/mapreduce/hadoop-mapreduce-client-core-2.7.7.jar!/" />
+      <root url="jar://C:/hadoop-2.7.7/share/hadoop/mapreduce/hadoop-mapreduce-client-shuffle-2.7.7.jar!/" />
+      <root url="jar://C:/hadoop-2.7.7/share/hadoop/mapreduce/hadoop-mapreduce-client-jobclient-2.7.7.jar!/" />
+      <root url="jar://C:/hadoop-2.7.7/share/hadoop/mapreduce/hadoop-mapreduce-examples-2.7.7.jar!/" />
+      <root url="file://C:/hadoop-2.7.7/share/hadoop/mapreduce/lib" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+    <jarDirectory url="file://C:/hadoop-2.7.7/share/hadoop/mapreduce/lib" recursive="false" />
+  </library>
+</component>

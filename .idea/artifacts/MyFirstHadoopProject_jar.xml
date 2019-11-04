@@ -1,0 +1,18 @@
+<component name="ArtifactManager">
+  <artifact name="MyFirstHadoopProject:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/MyFirstHadoopProject_jar</output-path>
+    <root id="root">
+      <element id="archive" name="MyFirstHadoopProject.jar">
+        <element id="directory" name="META-INF">
+          <element id="file-copy" path="$PROJECT_DIR$/src/META-INF/MANIFEST.MF" />
+        </element>
+        <element id="module-output" name="MyFirstHadoopProject" />
+      </element>
+      <element id="library" level="project" name="hadoop-mapreduce-2.7.7" />
+      <element id="library" level="project" name="hadoop-common-2.7.7" />
+      <element id="library" level="project" name="hadoop-yarn-2.7.7" />
+      <element id="library" level="project" name="hadoop-tools" />
+      <element id="library" level="project" name="hadoop-hdfs-2.7.7" />
+    </root>
+  </artifact>
+</component>

@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="hadoop-tools">
+    <CLASSES>
+      <root url="file://C:/hadoop-2.7.7/share/hadoop/tools/lib" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://C:/hadoop-2.7.7/share/hadoop/tools/lib" />
+    </SOURCES>
+    <jarDirectory url="file://C:/hadoop-2.7.7/share/hadoop/tools/lib" recursive="false" />
+    <jarDirectory url="file://C:/hadoop-2.7.7/share/hadoop/tools/lib" recursive="false" type="SOURCES" />
+  </library>
+</component>

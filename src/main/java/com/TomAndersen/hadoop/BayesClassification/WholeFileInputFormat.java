@@ -19,7 +19,7 @@ import java.io.IOException;
  * 自定义InputFormat，将整个文件作为一条record，并将文件名作为KeyIn
  */
 public class WholeFileInputFormat extends FileInputFormat<Text, BytesWritable> {
-
+    //自定义InputFromat，其中传给Map的KeyIn-ValueIn类型分别为Text和BytesWritable
     @Override
     public RecordReader<Text, BytesWritable> createRecordReader
             (InputSplit inputSplit, TaskAttemptContext taskAttemptContext) throws IOException, InterruptedException {
@@ -30,6 +30,6 @@ public class WholeFileInputFormat extends FileInputFormat<Text, BytesWritable> {
 
     @Override
     protected boolean isSplitable(JobContext context, Path filename) {
-        return false;
+        return false;//返回false即不允许分片
     }
 }

@@ -6,7 +6,6 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.IOUtils;
-import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.RecordReader;
@@ -21,6 +20,7 @@ import java.io.IOException;
  * @Date 2019/11/4
  */
 public class WholeFileRecordReader extends RecordReader<Text, BytesWritable> {
+    //自定义RecordReader，每次将一整个文档作为一个record的Value，将文档名作为Key
     private FileSplit fileSplit;    //保存输入的分片，它将被转换成一条(key,value)记录
     private Configuration conf;     //配置对象
     private BytesWritable value = new BytesWritable();  //value对象，内容为空

@@ -33,41 +33,6 @@ import java.io.IOException;
  */
 
 public class Job1 extends Configured implements Tool {
-    private final static Text KEYOUT = new Text();
-    private final static IntWritable VALUEOUT = new IntWritable(1);
-
-    class Job1Mapper extends Mapper<Text, BytesWritable, Text, IntWritable> {
-        @Override
-        public void map(Text KeyIn, BytesWritable ValueIn, Context context)
-                throws IOException, InterruptedException {//KeyIn是文档名，ValueIn是文档内容
-            // Text, BytesWritable, Text, IntWritable输入输出键值对类型
-            // 将文档内容按照回车分割，即分割成一个个单词
-            String[] contents = new String(ValueIn.getBytes()).split("\\n");
-            // 获取文档类别，文档名中已有类别戳
-            String fileClass = KeyIn.toString().split("-")[0];
-
-            for (String word : contents) {
-                // 对每个单词加上类别名
-                KEYOUT.set(fileClass + "-" + word);//设置KeyOut
-                context.write(KEYOUT, VALUEOUT);
-            }
-        }
-    }
-
-    class Job1Reducer extends Reducer<Text, IntWritable, Text, IntWritable> {
-
-        @Override
-        public void reduce(Text KeyIn, Iterable<IntWritable> ValuesIn, Context context)
-                throws IOException, InterruptedException {
-
-            int sum = 0;
-            for (IntWritable Value : ValuesIn) {
-                sum += Value.get();
-            }
-            // 输出<文档类别-单词，单词总数>
-            context.write(KeyIn, new IntWritable(sum));
-        }
-    }
 
     @Override
     public int run(String[] args) throws Exception {
@@ -90,4 +55,40 @@ public class Job1 extends Configured implements Tool {
         return job.waitForCompletion(true) ? 0 : 1;
     }
 
+}
+
+class Job1Mapper extends Mapper<Text, BytesWritable, Text, IntWritable> {
+    private final static Text KEYOUT = new Text();
+    private final static IntWritable VALUEOUT = new IntWritable(1);
+
+    @Override
+    public void map(Text KeyIn, BytesWritable ValueIn, Context context)
+            throws IOException, InterruptedException {//KeyIn是文档名，ValueIn是文档内容
+        // Text, BytesWritable, Text, IntWritable输入输出键值对类型
+        // 将文档内容按照回车分割，即分割成一个个单词
+        String[] contents = new String(ValueIn.getBytes()).split("\\n");
+        // 获取文档类别，文档名中已有类别戳
+        String fileClass = KeyIn.toString().split("-")[0];
+
+        for (String word : contents) {
+            // 对每个单词加上类别名
+            KEYOUT.set(fileClass + "-" + word);//设置KeyOut
+            context.write(KEYOUT, VALUEOUT);
+        }
+    }
+}
+
+class Job1Reducer extends Reducer<Text, IntWritable, Text, IntWritable> {
+
+    @Override
+    public void reduce(Text KeyIn, Iterable<IntWritable> ValuesIn, Context context)
+            throws IOException, InterruptedException {
+
+        int sum = 0;
+        for (IntWritable Value : ValuesIn) {
+            sum += Value.get();
+        }
+        // 输出<文档类别-单词，单词总数>
+        context.write(KeyIn, new IntWritable(sum));
+    }
 }

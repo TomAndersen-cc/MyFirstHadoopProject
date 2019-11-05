@@ -78,9 +78,8 @@ public class Job1 extends Configured implements Tool {
         Configuration configuration = new Configuration();
         Job job = Job.getInstance(configuration, this.getClass().getName());
 
-        job.setInputFormatClass(WholeFileInputFormat.class);
+        job.setInputFormatClass(WholeFileInputFormat.class);//设置输入格式
 
-        job.setJarByClass(Job1.class);// 设置Job运行主类
         job.setMapperClass(Job1Mapper.class);// 设置Mapper
         job.setCombinerClass(Job1Reducer.class);// 设置Combiner
         job.setReducerClass(Job1Reducer.class);// 设置Reducer

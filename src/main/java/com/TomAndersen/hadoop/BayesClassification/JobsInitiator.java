@@ -35,8 +35,9 @@ public class JobsInitiator {
             System.exit(1);
         }
 
-        BayesTools.CheckOutputPath(Job1_OutputPath);
-        int Job1exitCode = ToolRunner.run(new Job1(), new String[]{args[0], Job1_OutputPath});
+        BayesTools.CheckOutputPath(args[1]);
+
+        int Job1exitCode = ToolRunner.run(new Job1(), new String[]{args[0], args[1]});
         System.exit(Job1exitCode);//当参数为0时表示正常终止JVM，为非0时表示异常终止
 
     }

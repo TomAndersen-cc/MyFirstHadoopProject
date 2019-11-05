@@ -22,7 +22,7 @@ public class WholeFileInputFormat extends FileInputFormat<Text, BytesWritable> {
     //自定义InputFromat，其中传给Map的KeyIn-ValueIn类型分别为Text和BytesWritable
     @Override
     public RecordReader<Text, BytesWritable> createRecordReader
-            (InputSplit inputSplit, TaskAttemptContext taskAttemptContext) throws IOException, InterruptedException {
+    (InputSplit inputSplit, TaskAttemptContext taskAttemptContext) throws IOException, InterruptedException {
         WholeFileRecordReader wholeFileRecordReader = new WholeFileRecordReader();
         wholeFileRecordReader.initialize(inputSplit, taskAttemptContext);
         return wholeFileRecordReader;
@@ -30,6 +30,6 @@ public class WholeFileInputFormat extends FileInputFormat<Text, BytesWritable> {
 
     @Override
     protected boolean isSplitable(JobContext context, Path filename) {
-        return false;//返回false即不允许分片
+        return false;//返回false即不允许分片，即一个文件只有一个分片
     }
 }

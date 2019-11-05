@@ -20,12 +20,14 @@ import java.io.IOException;
  * @Date 2019/11/4
  */
 public class WholeFileRecordReader extends RecordReader<Text, BytesWritable> {
-    //自定义RecordReader，每次将一整个文档作为一个record的Value，将文档名作为Key
-    private FileSplit fileSplit;    //保存输入的分片，它将被转换成一条(key,value)记录
-    private Configuration conf;     //配置对象
-    private BytesWritable value = new BytesWritable();  //value对象，内容为空
+    // 自定义RecordReader，每次将一整个文档的全部内容作为一个record的Value，将文档名作为Key
+    private FileSplit fileSplit;    // 保存输入的分片，它将被转换成一条(key,value)记录
+    private Configuration conf;     // 配置对象
+    private BytesWritable value = new BytesWritable();  // value对象，内容为空
     private Text key = new Text();
-    private boolean processed = false;  //被处理标识
+    private boolean processed = false;  // 被处理标识
+    // RecordReader会调用多次nextKeyValue，因为设置了整个文件只有一个split
+    // 即只需要处理一次即可，故设置被处理标识
 
     @Override
     public void initialize(InputSplit inputSplit, TaskAttemptContext context) throws IOException, InterruptedException {
@@ -65,17 +67,19 @@ public class WholeFileRecordReader extends RecordReader<Text, BytesWritable> {
 
     @Override
     public Text getCurrentKey() throws IOException, InterruptedException {
-        return key;
+        return key;//前面nextKeyValue方法中已经配置好了Key，直接返回即可
     }
 
     @Override
     public BytesWritable getCurrentValue() throws IOException, InterruptedException {
-        return value;
+        return value;//前面nextKeyValue方法中已经配置好了Value，直接返回即可
     }
 
     @Override
     public float getProgress() throws IOException, InterruptedException {
         return processed ? 1.0f : 0.0f;
+        //返回一个浮点数，表示已经处理的数据占要处理数据的百分比
+        // 由于一次读整个文档，故不是1.0就是0.0
     }
 
     @Override

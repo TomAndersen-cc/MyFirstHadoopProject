@@ -1,5 +1,6 @@
 package com.TomAndersen.hadoop.BayesClassification;
 
+import com.TomAndersen.hadoop.HDFSTools.CombineSmallfileInputFormat;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
@@ -43,11 +44,24 @@ public class Job1 extends Configured implements Tool {
         Configuration configuration = new Configuration();
         Job job = Job.getInstance(configuration, this.getClass().getName());
 
-        job.setInputFormatClass(WholeFileInputFormat.class);//设置输入格式
+        //job.setInputFormatClass(WholeFileInputFormat.class);//设置输入格式
+        job.setInputFormatClass(CombineSmallfileInputFormat.class);//设置输入格式
+
+        job.setJarByClass(Job1.class);//设置主类
 
         job.setMapperClass(Job1Mapper.class);// 设置Mapper
         job.setCombinerClass(Job1Reducer.class);// 设置Combiner
         job.setReducerClass(Job1Reducer.class);// 设置Reducer
+
+        // TextOutputFormat 默认是Key是LongWritable类型，Value是Text类型
+        // 当自定义InputFormat时一定也要自定义Map输出键值对类型，否则会报错
+        job.setMapOutputKeyClass(Text.class);
+        job.setMapOutputValueClass(IntWritable.class);
+
+        //设置job输出的key类型
+        job.setOutputKeyClass(Text.class);
+        //设置job输出的value类型
+        job.setOutputValueClass(IntWritable.class);
 
         FileInputFormat.addInputPath(job, new Path(InputPath));// 添加输入路径
         FileOutputFormat.setOutputPath(job, new Path(OutputPath));// 设置输出路径
@@ -55,40 +69,55 @@ public class Job1 extends Configured implements Tool {
         return job.waitForCompletion(true) ? 0 : 1;
     }
 
-}
+    //Mapper
+    public static class Job1Mapper extends Mapper<Text, BytesWritable, Text, IntWritable> {
+        private final static Text KEYOUT = new Text();
+        private final static IntWritable VALUEOUT = new IntWritable(1);
 
-class Job1Mapper extends Mapper<Text, BytesWritable, Text, IntWritable> {
-    private final static Text KEYOUT = new Text();
-    private final static IntWritable VALUEOUT = new IntWritable(1);
+    /*//使用正则比表达式去除 制表符单词
+    private Pattern pattern = Pattern.compile("^\\s+|\t+$");*/
 
-    @Override
-    public void map(Text KeyIn, BytesWritable ValueIn, Context context)
-            throws IOException, InterruptedException {//KeyIn是文档名，ValueIn是文档内容
-        // Text, BytesWritable, Text, IntWritable输入输出键值对类型
-        // 将文档内容按照回车分割，即分割成一个个单词
-        String[] contents = new String(ValueIn.getBytes()).split("\\n");
-        // 获取文档类别，文档名中已有类别戳
-        String fileClass = KeyIn.toString().split("-")[0];
+        @Override
+        public void map(Text KeyIn, BytesWritable ValueIn, Context context)
+                throws IOException, InterruptedException {//KeyIn是文档名，ValueIn是文档内容
+            // Text, BytesWritable, Text, IntWritable输入输出键值对类型
+            // 将文档内容按照回车分割，即分割成一个个单词
+            String[] contents = new String(ValueIn.getBytes()).split("\r\n|\n|\r|\u0000+");
+            // 以各种系统的换行形式以及Unicode字符的null作为分隔符进行切分
+            // 不知道为什么原数据集中那么多Unicode的空
 
-        for (String word : contents) {
-            // 对每个单词加上类别名
-            KEYOUT.set(fileClass + "-" + word);//设置KeyOut
-            context.write(KEYOUT, VALUEOUT);
+            // 获取文档类别，文档名中已有类别戳
+            String fileClass = KeyIn.toString().split("-")[0];
+
+            for (String word : contents) {
+            /*Matcher matcher = pattern.matcher(word);
+            if(matcher.matches()) continue;*/
+
+                // 对每个单词加上类别名
+                KEYOUT.set(fileClass + "\t" + word);//设置KeyOut
+                context.write(KEYOUT, VALUEOUT);
+            }
         }
     }
-}
 
-class Job1Reducer extends Reducer<Text, IntWritable, Text, IntWritable> {
+    //Reducer
+    public static class Job1Reducer extends Reducer<Text, IntWritable, Text, IntWritable> {
 
-    @Override
-    public void reduce(Text KeyIn, Iterable<IntWritable> ValuesIn, Context context)
-            throws IOException, InterruptedException {
+        @Override
+        public void reduce(Text KeyIn, Iterable<IntWritable> ValuesIn, Context context)
+                throws IOException, InterruptedException {
 
-        int sum = 0;
-        for (IntWritable Value : ValuesIn) {
-            sum += Value.get();
+            int sum = 0;
+            for (IntWritable Value : ValuesIn) {
+                sum += Value.get();
+            }
+            // 输出<文档类别-单词，单词总数>
+            context.write(KeyIn, new IntWritable(sum));
         }
-        // 输出<文档类别-单词，单词总数>
-        context.write(KeyIn, new IntWritable(sum));
     }
+
 }
+
+
+
+

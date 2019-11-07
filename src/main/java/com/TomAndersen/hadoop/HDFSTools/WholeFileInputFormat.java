@@ -1,4 +1,4 @@
-package com.TomAndersen.hadoop.BayesClassification;
+package com.TomAndersen.hadoop.HDFSTools;
 
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.BytesWritable;

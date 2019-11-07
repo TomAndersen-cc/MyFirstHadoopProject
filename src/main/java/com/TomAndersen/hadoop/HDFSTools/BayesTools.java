@@ -5,7 +5,6 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 
 import java.io.IOException;
-import java.net.URI;
 
 
 /**
@@ -23,7 +22,11 @@ public class BayesTools {
         Path outPath = new Path(outputPath);
 
         if (fs.exists(outPath)) {
-            fs.deleteOnExit(outPath);
+            /*fs.deleteOnExit(outPath);// 此方法为在程序退出时删除，应该是在当场就删除
+            fs.close();*/
+            fs.delete(outPath, true);
+            fs.close();
+
             System.out.println("Delete " + outputPath + " succeed!");
         } else {
             System.out.println(outputPath + " does not exist!");

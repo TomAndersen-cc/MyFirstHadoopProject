@@ -1,0 +1,13 @@
+<component name="ArtifactManager">
+  <artifact name="WordCount">
+    <output-path>$PROJECT_DIR$/out/artifacts/WordCount</output-path>
+    <root id="root">
+      <element id="archive" name="WordCount.jar">
+        <element id="directory" name="META-INF">
+          <element id="file-copy" path="$PROJECT_DIR$/src/main/java/com/TomAndersen/hadoop/MyFirstProject/META-INF/MANIFEST.MF" />
+        </element>
+        <element id="module-output" name="MyFirstHadoopProject" />
+      </element>
+    </root>
+  </artifact>
+</component>

@@ -1,4 +1,4 @@
-package com.TomAndersen.hadoop.BayesClassification;
+package com.TomAndersen.hadoop.HDFSTools;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
@@ -26,6 +26,7 @@ public class WholeFileRecordReader extends RecordReader<Text, BytesWritable> {
     private BytesWritable value = new BytesWritable();  // value对象，内容为空
     private Text key = new Text();
     private boolean processed = false;  // 被处理标识
+    protected RecordReader<Text,BytesWritable> recordReader;
     // RecordReader会调用多次nextKeyValue，因为设置了整个文件只有一个split
     // 即只需要处理一次即可，故设置被处理标识
 
@@ -33,6 +34,7 @@ public class WholeFileRecordReader extends RecordReader<Text, BytesWritable> {
     public void initialize(InputSplit inputSplit, TaskAttemptContext context) throws IOException, InterruptedException {
         this.fileSplit = (FileSplit) inputSplit;
         this.conf = context.getConfiguration();
+
     }
 
     @Override

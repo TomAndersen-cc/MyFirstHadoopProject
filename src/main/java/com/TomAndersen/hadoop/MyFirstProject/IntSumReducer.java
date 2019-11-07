@@ -6,6 +6,7 @@ import org.apache.hadoop.mapreduce.Reducer;
 
 import java.io.IOException;
 
+
 /**
  * 本类继承自Reducer类，负责重写父类中的Reduce函数
  * Reducer<Text,IntWritable,Text,IntWritable>泛型的参数分别表示reduce函数输入和输出的键值对类型
@@ -24,6 +25,7 @@ public class IntSumReducer
      */
 
 
+    @Override
     public void reduce(Text KeyIn, Iterable<IntWritable> ValuesIn, Context context)
             throws IOException, InterruptedException {
         //输出map的记录数

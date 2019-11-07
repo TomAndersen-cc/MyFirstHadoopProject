@@ -1,6 +1,7 @@
 package com.TomAndersen.hadoop.MyFirstProject;
 
 
+import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
@@ -17,7 +18,7 @@ import java.io.IOException;
  */
 
 public class TokenizerMapper
-        extends Mapper<LongWritable, Text, Text, IntWritable> {
+        extends Mapper<Text, BytesWritable, Text, IntWritable> {
     //定义一个IntWritable类型的私有静态常量WORD_VALUE，并初始化为1，用于生成 <word,value> 键值对
     // 便于后续的Reduce操作直接将value相加，进而统计相同word的数量
     private final static IntWritable WORD_VALUE = new IntWritable(1);
@@ -35,13 +36,15 @@ public class TokenizerMapper
     //用于统计总共记录数
     //public static int sumOfTerms = 0;
     @Override
-    public void map(LongWritable KeyIn, Text ValueIn, Context context)
+    public void map(Text KeyIn, BytesWritable ValueIn, Context context)
             throws IOException, InterruptedException {
         //sumOfTerms++;
         //将读取的一行Text文本转化为Java的字符串String类型
-        String line = ValueIn.toString();
+
+        //String line = ValueIn.toString();
+        String line = new String(ValueIn.getBytes());
         //按照空格符切分出一行字符串中包含的所有单词，并存储到字符串数组中
-        String[] words = line.split(" ");
+        String[] words = line.split("\r\n|\n|\r|\u0000+");
         //循环遍历字符串数组words，将其中的每个单词作为KeyOut值，上面定义的IntWritable类型常量WORD_VALUE作为ValueOut值
         for (String word : words) {
             //用Text类型的静态常量WORD记录单词word
@@ -51,6 +54,8 @@ public class TokenizerMapper
             //指的是根据word分组之后的value的集合，这样便于之后的Reduce操作
             context.write(WORD, WORD_VALUE);
         }
+
+        /*context.write(new Text(line),WORD_VALUE);*/
     }
 
 }

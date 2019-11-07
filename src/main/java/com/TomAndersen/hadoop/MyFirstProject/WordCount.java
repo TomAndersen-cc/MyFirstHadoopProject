@@ -1,10 +1,13 @@
 package com.TomAndersen.hadoop.MyFirstProject;
 
 
+import com.TomAndersen.hadoop.HDFSTools.BayesTools;
+import com.TomAndersen.hadoop.HDFSTools.CombineSmallfileInputFormat;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.lib.input.CombineTextInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
@@ -22,15 +25,25 @@ public class WordCount {
         String InputPath = args[0];
         //经过MapReduce框架处理后输出的文件路径
         String OutPutPath = args[1];
+        //检查输出路径，如果输出路径已经存在则删除
+        BayesTools.CheckOutputPath(args[1]);
         //获取MapReduce运行配置
         Configuration conf = new Configuration();
+
+        /*conf.setInt("mapreduce.map.memory.mb", 256);
+        conf.setInt("mapreduce.job.maps", 4);*/
+
         //创建MapReduce的job对象
         Job job = Job.getInstance(conf, WordCount.class.getName());
         //设置job运行时的程序入口主类WordCount
         job.setJarByClass(WordCount.class);
         //-----------------------------------------
         //通过job设置输入/输出格式为文本格式，我们目前操作的基本都是文本类型
-        job.setInputFormatClass(TextInputFormat.class);
+        //job.setInputFormatClass(TextInputFormat.class);
+
+        //使用CombineTextInputFormat将小文件聚集成一个Split，使用一个Map进行处理
+        job.setInputFormatClass(CombineSmallfileInputFormat.class);
+
         job.setOutputFormatClass(TextOutputFormat.class);
         //-----------------------------------------
         //设置map函数的实现类对象
@@ -45,6 +58,8 @@ public class WordCount {
         job.setOutputKeyClass(Text.class);
         //设置job输出的value类型
         job.setOutputValueClass(IntWritable.class);
+
+
 
         //设置输入文件的路径
         FileInputFormat.addInputPath(job, new Path(InputPath));

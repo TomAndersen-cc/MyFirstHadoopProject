@@ -11,10 +11,10 @@ import org.apache.hadoop.util.ToolRunner;
  * 用于启动所有的Job，本类中只进行作业调度
  */
 public class JobsInitiator {
-    private static final String Job1_OutputPath = "hdfs://localhost:9000/OutPut/Job1/";
-    private static final String Job2_OutputPath = "hdfs://localhost:9000/OutPut/Job2/";
-    private static final String Job3_OutputPath = "hdfs://localhost:9000/OutPut/Job3/";
-    private static final String Job4_OutputPath = "hdfs://localhost:9000/OutPut/Job4/";
+    private static final String Job1_OutputPath = "/OutPut/Job1/";
+    private static final String Job2_OutputPath = "/OutPut/Job2/";
+    private static final String Job3_OutputPath = "/OutPut/Job3/";
+    private static final String Job4_OutputPath = "/OutPut/Job4/";
 
     public static void main(String[] args) throws Exception {
         // args中有两个参数，第一个为训练集，第二个为测试集
@@ -35,9 +35,9 @@ public class JobsInitiator {
             System.exit(1);
         }
 
-        BayesTools.CheckOutputPath(args[1]);
-
-        int Job1exitCode = ToolRunner.run(new Job1(), new String[]{args[0], args[1]});
+        BayesTools.CheckOutputPath(Job1_OutputPath);//检查输出路径是否为空
+        int Job1exitCode = ToolRunner.run(new Job1(), new String[]{args[0], Job1_OutputPath});
+        //Job1输入路径为训练集，输出路径为自定义路径
         System.exit(Job1exitCode);//当参数为0时表示正常终止JVM，为非0时表示异常终止
 
     }

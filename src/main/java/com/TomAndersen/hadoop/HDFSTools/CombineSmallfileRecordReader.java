@@ -36,7 +36,7 @@ public class CombineSmallfileRecordReader extends RecordReader<Text, BytesWritab
     @Override
     public void initialize(InputSplit inputSplit, TaskAttemptContext context) throws IOException, InterruptedException {
         this.combineFileSplit = (CombineFileSplit) inputSplit;
-        // 处理CombineFileSplit中的一个小文件Block，因为使用LineRecordReader，需要构造一个FileSplit对象，然后才能够读取数据
+        // 处理CombineFileSplit中的一个小文件Block，因为使用WholeFileRecordReader，需要构造一个FileSplit对象，然后才能够读取数据
         FileSplit fileSplit = new FileSplit(combineFileSplit.getPath(currentIndex), combineFileSplit.getOffset(currentIndex), combineFileSplit.getLength(currentIndex), combineFileSplit.getLocations());
         wholeFileRecordReader.initialize(fileSplit, context);
 

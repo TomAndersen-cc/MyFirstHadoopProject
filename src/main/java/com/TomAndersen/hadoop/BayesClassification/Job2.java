@@ -1,11 +1,17 @@
 package com.TomAndersen.hadoop.BayesClassification;
 
+import com.TomAndersen.hadoop.HDFSTools.CombineSmallfileInputFormat;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
 
 import java.io.IOException;
@@ -27,8 +33,38 @@ public class Job2 extends Configured implements Tool {
 
 
     @Override
-    public int run(String[] strings) throws Exception {
-        return 0;
+    public int run(String[] args) throws Exception {
+        // 重写run方法，外部使用ToolRunner启动Job
+        // 第一个参数为训练集，第二个参数为输出路径
+        String InputPath = args[0];
+        String OutputPath = args[1];
+        Configuration configuration = new Configuration();
+        Job job = Job.getInstance(configuration, this.getClass().getName());
+
+        // 设置输入格式,使用整合小文件block的方式输入
+        job.setInputFormatClass(CombineSmallfileInputFormat.class);
+
+        job.setJarByClass(Job2.class);//设置主类
+
+        job.setMapperClass(Job2Mapper.class);// 设置Mapper
+        // 不能设置combiner
+        job.setReducerClass(Job2Reducer.class);// 设置Reducer
+
+        // TextOutputFormat 默认是Key是LongWritable类型，Value是Text类型
+        // 当自定义InputFormat时一定也要自定义Map输出键值对类型，否则会使用默认类型从而报错
+        // 设置Map输出Key Value类型
+        job.setMapOutputKeyClass(Text.class);
+        job.setMapOutputValueClass(IntWritable.class);
+
+        //设置job输出的key类型
+        job.setOutputKeyClass(Text.class);
+        //设置job输出的value类型
+        job.setOutputValueClass(IntWritable.class);
+
+        FileInputFormat.addInputPath(job, new Path(InputPath));// 添加输入路径
+        FileOutputFormat.setOutputPath(job, new Path(OutputPath));// 设置输出路径
+
+        return job.waitForCompletion(true) ? 0 : 1;
     }
 
     public static class Job2Mapper extends Mapper<Text, BytesWritable, Text, IntWritable> {
@@ -71,6 +107,9 @@ public class Job2 extends Configured implements Tool {
                 sumOfFiles += 1;
             }
             // KeyOut为<文档类别 本类单词总数>,KeyIn为文档类别
+            String fileClass = KeyIn.toString();
+            // 以制表符 \t 作为分隔符
+            KEYOUT.set(fileClass + "\t" + Integer.toString(sumOfWords));
 
             // ValueOut为本类文档个数
             VALUEOUT.set(sumOfFiles);

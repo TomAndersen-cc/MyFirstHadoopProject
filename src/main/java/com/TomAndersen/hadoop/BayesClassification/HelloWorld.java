@@ -60,5 +60,8 @@ public class HelloWorld {
         System.out.println(bytesWritable1.toString());
         System.out.println(new String(bytesWritable1.getBytes()));
 
+        // 测试系统退出状态是否只有非0和0两种选项，结果表面0代表正常退出，非0都代表不正常退出
+        // System.exit(-4);
+
     }
 }

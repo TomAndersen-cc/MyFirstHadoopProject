@@ -54,7 +54,7 @@ public class Job1 extends Configured implements Tool {
         job.setReducerClass(Job1Reducer.class);// 设置Reducer
 
         // TextOutputFormat 默认是Key是LongWritable类型，Value是Text类型
-        // 当自定义InputFormat时一定也要自定义Map输出键值对类型，否则会报错
+        // 当自定义InputFormat时一定也要自定义Map输出键值对类型，否则会使用默认类型从而报错
         job.setMapOutputKeyClass(Text.class);
         job.setMapOutputValueClass(IntWritable.class);
 
@@ -66,16 +66,14 @@ public class Job1 extends Configured implements Tool {
         FileInputFormat.addInputPath(job, new Path(InputPath));// 添加输入路径
         FileOutputFormat.setOutputPath(job, new Path(OutputPath));// 设置输出路径
 
+
         return job.waitForCompletion(true) ? 0 : 1;
     }
 
     //Mapper
     public static class Job1Mapper extends Mapper<Text, BytesWritable, Text, IntWritable> {
-        private final static Text KEYOUT = new Text();
-        private final static IntWritable VALUEOUT = new IntWritable(1);
-
-    /*//使用正则比表达式去除 制表符单词
-    private Pattern pattern = Pattern.compile("^\\s+|\t+$");*/
+        private final static Text KEYOUT = new Text();//预定义KeyOut
+        private final static IntWritable VALUEOUT = new IntWritable(1);//预定义ValueOut
 
         @Override
         public void map(Text KeyIn, BytesWritable ValueIn, Context context)
@@ -90,11 +88,9 @@ public class Job1 extends Configured implements Tool {
             String fileClass = KeyIn.toString().split("-")[0];
 
             for (String word : contents) {
-            /*Matcher matcher = pattern.matcher(word);
-            if(matcher.matches()) continue;*/
-
                 // 对每个单词加上类别名
-                KEYOUT.set(fileClass + "\t" + word);//设置KeyOut
+                KEYOUT.set(fileClass + "\t" + word);//设置KeyOut，使用制表符来间隔文档类别和单词
+                //输出格式为<类别名 单词，“1”>
                 context.write(KEYOUT, VALUEOUT);
             }
         }
@@ -102,6 +98,7 @@ public class Job1 extends Configured implements Tool {
 
     //Reducer
     public static class Job1Reducer extends Reducer<Text, IntWritable, Text, IntWritable> {
+        private final static IntWritable VALUEOUT = new IntWritable();//预定义ValueOut
 
         @Override
         public void reduce(Text KeyIn, Iterable<IntWritable> ValuesIn, Context context)
@@ -109,10 +106,12 @@ public class Job1 extends Configured implements Tool {
 
             int sum = 0;
             for (IntWritable Value : ValuesIn) {
-                sum += Value.get();
+                sum += Value.get();// 要使用combiner就不能只是单纯的计数+1，而应该是取值相加
             }
-            // 输出<文档类别-单词，单词总数>
-            context.write(KeyIn, new IntWritable(sum));
+            // 输出<类别名  单词，单词总数>
+            VALUEOUT.set(sum);
+            context.write(KeyIn, VALUEOUT);
+
         }
     }
 

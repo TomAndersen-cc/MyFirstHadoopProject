@@ -1,6 +1,7 @@
 package com.TomAndersen.hadoop.MyFirstProject;
 
 
+import com.TomAndersen.hadoop.BayesClassification.JobsInitiator;
 import com.TomAndersen.hadoop.HDFSTools.BayesTools;
 import com.TomAndersen.hadoop.HDFSTools.CombineSmallfileInputFormat;
 import org.apache.hadoop.conf.Configuration;
@@ -25,8 +26,9 @@ public class WordCount {
         String InputPath = args[0];
         //经过MapReduce框架处理后输出的文件路径
         String OutPutPath = args[1];
+        OutPutPath = JobsInitiator.Job1_OutputPath;
         //检查输出路径，如果输出路径已经存在则删除
-        BayesTools.CheckOutputPath(args[1]);
+        BayesTools.CheckOutputPath(OutPutPath);
         //获取MapReduce运行配置
         Configuration conf = new Configuration();
 
@@ -58,7 +60,6 @@ public class WordCount {
         job.setOutputKeyClass(Text.class);
         //设置job输出的value类型
         job.setOutputValueClass(IntWritable.class);
-
 
 
         //设置输入文件的路径

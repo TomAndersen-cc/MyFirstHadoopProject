@@ -26,7 +26,7 @@ import java.io.IOException;
  * Mapper：
  * 输入：<文档名,整个文档>，输出：<文档类别，本文档中单词总数sum>
  * Reducer：
- * 输入：<文档类别，{sum1，sum2……}>，输出：<文档类别—本类文档单词总数，本类文档个数>
+ * 输入：<文档类别，{sum1，sum2……}>，输出：<文档类别 本类文档单词总数，本类文档个数>
  * 其中“本类文档个数”由sum的个数来计算，每有一个sum则说明有一个对应的文档属于当前类别，因为是一个文档作为一个记录进行处理
  */
 public class Job2 extends Configured implements Tool {
@@ -35,9 +35,11 @@ public class Job2 extends Configured implements Tool {
     @Override
     public int run(String[] args) throws Exception {
         // 重写run方法，外部使用ToolRunner启动Job
+
         // 第一个参数为训练集，第二个参数为输出路径
         String InputPath = args[0];
         String OutputPath = args[1];
+
         Configuration configuration = new Configuration();
         Job job = Job.getInstance(configuration, this.getClass().getName());
 
@@ -109,7 +111,7 @@ public class Job2 extends Configured implements Tool {
             // KeyOut为<文档类别 本类单词总数>,KeyIn为文档类别
             String fileClass = KeyIn.toString();
             // 以制表符 \t 作为分隔符
-            KEYOUT.set(fileClass + "\t" + Integer.toString(sumOfWords));
+            KEYOUT.set(fileClass + "\t" + sumOfWords);
 
             // ValueOut为本类文档个数
             VALUEOUT.set(sumOfFiles);

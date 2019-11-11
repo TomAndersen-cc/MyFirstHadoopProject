@@ -2,8 +2,10 @@ package com.TomAndersen.hadoop.BayesClassification;
 
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.fs.Path;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -63,5 +65,26 @@ public class HelloWorld {
         // 测试系统退出状态是否只有非0和0两种选项，结果表面0代表正常退出，非0都代表不正常退出
         // System.exit(-4);
 
+        HashMap<String, String> myMap = new HashMap<>();
+        String[] words = new String[10];
+        HashMap[] KeyValues = new HashMap[10];// 创建HashMap数组的形式，不需要定义泛型
+        HashMap<String, String>[] myMaps = null;
+        myMaps = new HashMap[10];
+
+        myMap.put("Tom", "24");
+        myMap.put("Alise", "22");
+        System.out.println(myMap);
+        /*System.out.println(KeyValues[0]);// 未赋值即为null
+        System.out.println(KeyValues[1]);// 未赋值即为null*/
+
+        System.out.println(SEPARATOR);
+        Text text1 = new Text();
+        text1.set("TomAndersen" + 13);
+        System.out.println(text1);
+
+        System.out.println(SEPARATOR);
+        String Job2OutpUtPath = "C:\\Users\\DELL\\Desktop\\HadoopProjects\\MyFirstHadoopProject\\src\\Input";
+        Path path = new Path(Job2OutpUtPath);
+        System.out.println(path);
     }
 }

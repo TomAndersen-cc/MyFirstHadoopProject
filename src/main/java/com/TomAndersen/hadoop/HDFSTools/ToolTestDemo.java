@@ -30,7 +30,7 @@ public class ToolTestDemo {
         Configuration configuration = new Configuration();
         HashMap[] myMaps = null;
         String filePath = "C:/Users/DELL/Desktop/HadoopProjects/Job2-part-r-00000";
-        myMaps = BayesTools.getKeyValuesByReadFile(filePath, configuration);
+        myMaps = BayesTools.getKeyValuesByReadFile(filePath, configuration,"\t");
         for (HashMap map : myMaps) {
             System.out.println(map);
         }

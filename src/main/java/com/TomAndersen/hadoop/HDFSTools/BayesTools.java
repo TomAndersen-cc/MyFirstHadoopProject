@@ -41,7 +41,7 @@ public class BayesTools {
     // 读取指定文档中的每一列，将第一列作为Key值，其他列作为Value，返回HashMap数组
     // 反正之后都要转换成其他类型，索性全都读取成String类型
     // demo测试通过
-    public static HashMap[] getKeyValuesByReadFile(String filePath, Configuration conf)
+    public static HashMap[] getKeyValuesByReadFile(String filePath, Configuration conf,String separator)
             throws IOException {
 
         FSDataInputStream fsDataInputStream = null;
@@ -61,7 +61,7 @@ public class BayesTools {
 
             while (bufferedReader.ready()) {
                 fileLine = bufferedReader.readLine();
-                fileText = fileLine.split("\t");
+                fileText = fileLine.split(separator);
                 if (multipleKeyValues == null) multipleKeyValues = new HashMap[fileText.length - 1];
                 for (int i = 1, fileTextLength = fileText.length; i < fileTextLength; i++) {
                     String text = fileText[i];

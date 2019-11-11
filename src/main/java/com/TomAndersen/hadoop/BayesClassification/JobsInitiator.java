@@ -38,10 +38,10 @@ public class JobsInitiator {
         final String TranDataSetPath = args[0];
         final String TestDataSetPath = args[0];
 
-        BayesTools.CheckOutputPath(Job1_OutputPath);//检查Job1输出路径是否为空
+        /*BayesTools.CheckOutputPath(Job1_OutputPath);//检查Job1输出路径是否为空
         int Job1exitCode = ToolRunner.run(new Job1(), new String[]{TranDataSetPath, Job1_OutputPath});
 
-        System.exit(Job1exitCode);// 当参数为0时表示正常终止JVM，为非0时表示异常终止
+        System.exit(Job1exitCode);// 当参数为0时表示正常终止JVM，为非0时表示异常终止*/
 
 
 /*        BayesTools.CheckOutputPath(Job2_OutputPath);//检查Job2输出路径是否为空
@@ -49,10 +49,10 @@ public class JobsInitiator {
 
         System.exit(Job2exitCode);// 当参数为0时表示正常终止JVM，为非0时表示异常终止*/
 
-        /*BayesTools.CheckOutputPath(Job3_OutputPath);//检查Job2输出路径是否为空
+        BayesTools.CheckOutputPath(Job3_OutputPath);//检查Job2输出路径是否为空
         int Job3exitCode = ToolRunner.run(new Job3(), new String[]{Job1_OutputPath, Job3_OutputPath});
 
-        System.exit(Job3exitCode);// 当参数为0时表示正常终止JVM，为非0时表示异常终止*/
+        System.exit(Job3exitCode);// 当参数为0时表示正常终止JVM，为非0时表示异常终止
 
     }
 }

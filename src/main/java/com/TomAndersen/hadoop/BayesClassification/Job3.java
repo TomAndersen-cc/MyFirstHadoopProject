@@ -41,7 +41,8 @@ public class Job3 extends Configured implements Tool {
 
         Configuration configuration = new Configuration();
         // 读取Job2的输出文件，获取文档类别到单词总数的映射
-        HashMap[] myMaps = BayesTools.getKeyValuesByReadFile(JobsInitiator.Job2_OutputPath, configuration);
+        HashMap[] myMaps = BayesTools.getKeyValuesByReadFile(JobsInitiator.Job2_OutputPath + "part-r-00000",
+                configuration,"\t");
 
         fileClassToSumOfWords = myMaps[0];// 因为知道文档输出类型及内容，所以直接取第一个Map即可
         // fileClassToSumOfFiles = myMaps[1];
@@ -63,6 +64,7 @@ public class Job3 extends Configured implements Tool {
         // 设置Mapper的输出Key-value类型
         job.setMapOutputKeyClass(Text.class);
         job.setMapOutputValueClass(DoubleWritable.class);
+
         // 添加输入路径
         FileInputFormat.addInputPath(job, new Path(InputPath));
         // 设置输出路径
@@ -71,14 +73,14 @@ public class Job3 extends Configured implements Tool {
         return job.waitForCompletion(true) ? 0 : 1;
     }
 
-    public static class Job3Mapper extends Mapper<NullWritable, Text, Text, DoubleWritable> {
+    public static class Job3Mapper extends Mapper<LongWritable, Text, Text, DoubleWritable> {
 
         private final static Text KEYOUT = new Text();//预定义KeyOut，避免多次New
         private final static DoubleWritable VALUEOUT = new DoubleWritable();//预定义ValueOut，避免多次New
 
         // 输入：<NullWritable，<文档类别   单词  单词总数>>
         // 输出：<文档类别 单词  条件概率>
-        public void map(NullWritable KeyIn, Text ValueIn, Context context)
+        public void map(LongWritable KeyIn, Text ValueIn, Context context)
                 throws IOException, InterruptedException {
 
             // 对输入的一行文本数据按制表符 \t 进行分割
@@ -92,7 +94,7 @@ public class Job3 extends Configured implements Tool {
                     Job3.fileClassToSumOfWords.get(fileClass));
             // 计算单词的条件概率
             // 设置输出的Key值，为<文档类别 单词>
-            KEYOUT.set(fileClass + "\t" + word);
+            KEYOUT.set(fileClass + "-" + word);
             // 设置输出的Value值，为单词条件概率
             VALUEOUT.set(sumOfWords / sumOfClassWord);
             context.write(KEYOUT, VALUEOUT);

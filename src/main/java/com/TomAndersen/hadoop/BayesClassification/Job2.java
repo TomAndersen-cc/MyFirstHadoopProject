@@ -51,6 +51,7 @@ public class Job2 extends Configured implements Tool {
         job.setMapperClass(Job2Mapper.class);// 设置Mapper
         // 不能设置combiner
         job.setReducerClass(Job2Reducer.class);// 设置Reducer
+        job.setNumReduceTasks(1);// 设置单个ReduceTask，确保输出文件只有一个，便于后面的Job进行读取
 
         // TextOutputFormat 默认是Key是LongWritable类型，Value是Text类型
         // 当自定义InputFormat时一定也要自定义Map输出键值对类型，否则会使用默认类型从而报错

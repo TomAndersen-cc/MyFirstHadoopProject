@@ -145,7 +145,7 @@ public class BayesTools {
         FileStatus[] fileStatuses = fs.listStatus(new Path(TranSetPath));
         // 获取测试集文档总数
         BayesTools.sumOfTestSetFiles = fileStatuses.length;
-        // 宏平均评价矩阵
+        // 宏平均评价矩阵：TP=[0][0],FP=[1][0],FN=[0][1],TN=[1][1]
         int[][] MacroAverage = new int[][]{{0, 0}, {0, 0}};
         // 分类结果准确率
         double accuracy = 0;
@@ -203,20 +203,27 @@ public class BayesTools {
             MacroAverage[1][0] += matix[1][0];
             MacroAverage[1][1] += matix[1][1];
         }
-        // 计算评价指标
+        // 计算评价指标TP=[0][0],FP=[1][0],FN=[0][1],TN=[1][1]
         // 计算准确率accuracy = (TP+TN)/(TP+TN+FP+FN)
         accuracy = (double) ((MacroAverage[0][0] + MacroAverage[1][1]) /
                 (MacroAverage[0][0] + MacroAverage[1][0] + MacroAverage[0][1] + MacroAverage[1][1]));
         // 计算精确率precious = TP/(TP+FP)
         precision = (double) (MacroAverage[0][0]) / (MacroAverage[0][0] + MacroAverage[1][0]);
-        // 计算召回率recall = TP/(FP+FN)
+        // 计算召回率recall = TP/(TP+FN)
         recall = (double) (MacroAverage[0][0]) / (MacroAverage[0][0] + MacroAverage[0][1]);
+        // 计算F1分数F1 = 2*precision*recall/(precision+recall)
+        F1 = 2 * precision * recall / (precision + recall);
 
+        // 输出评价指标
+        System.out.println("accuracy: " + accuracy);
+        System.out.println("precision: " + precision);
+        System.out.println("recall: " + recall);
+        System.out.println("F1: " + F1);
 
     }
 
     // 本方法用于判断某单个文件属于哪个类别
-    private static String Classifier(Path filePath, Configuration configuration) throws IOException {
+    public static String Classifier(Path filePath, Configuration configuration) throws IOException {
         String fileJudgedClass = null;// 判定类别
         double prob = Double.MIN_VALUE; // 相对概率
         Set<String> fileClasses = BayesTools.fileClassToSumOfFiles.keySet();// 获取所有类别
@@ -231,7 +238,7 @@ public class BayesTools {
     }
 
     // 本方法用于计算某个文档在某个类别中出现的相对概率
-    private static double getRelativePosibility(Path filePath, String fileClass, Configuration configuration) throws IOException {
+    public static double getRelativePosibility(Path filePath, String fileClass, Configuration configuration) throws IOException {
 
         double prob = 0; // 当前文档在当前类别中出现的条件概率
         FileSystem fileSystem = FileSystem.get(configuration); // 获取文件系统

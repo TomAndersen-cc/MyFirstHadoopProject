@@ -1,7 +1,7 @@
 <component name="ArtifactManager">
-  <artifact name="MyFirstHadoopProject:jar">
-    <output-path>$PROJECT_DIR$/out/artifacts/MyFirstHadoopProject_jar</output-path>
-    <root id="root">
+  <artifact type="jar" name="BayesClassifier">
+    <output-path>$PROJECT_DIR$/out/artifacts/BayesClassifier</output-path>
+    <root id="archive" name="BayesClassifier.jar">
       <element id="archive" name="MyFirstHadoopProject.jar">
         <element id="directory" name="META-INF">
           <element id="file-copy" path="$PROJECT_DIR$/src/main/java/com/TomAndersen/hadoop/BayesClassification/META-INF/MANIFEST.MF" />

@@ -64,7 +64,7 @@ public class JobsInitiator {
 
         // 使用训练好的模型进行分类
         // BayesTools.BayesClassifier(TestDataSetPath);
-        // 将建模和测试分为两个程序比较好，不放在这里运行了
+        // 将分类器建模和分类器测试分为两个程序比较好，就不放在这里运行了
 
     }
 }

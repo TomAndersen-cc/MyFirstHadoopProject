@@ -17,7 +17,7 @@ import java.util.HashMap;
  * @Author
  * @Version
  * @Date 2019/11/5
- * 用于测试工具包中的函数是否可用
+ * 用于测试工具包中的各个方法是否可用
  */
 public class ToolTestDemo {
     public static void main(String[] args) throws IOException {

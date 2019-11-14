@@ -24,12 +24,12 @@ import java.util.Set;
  */
 public class BayesTools {
     /**
-     * 用于判断HDFS中某路径下是否已经存在文件夹，若存在则清空文件夹内文件，以免每次测试都需要手动删除文件夹内容
-     * demo测试通过
-     *
-     * @param outputPath
-     * @throws IOException
-     */
+     * @Param [(String)outputPath]
+     * @Return void
+     * @Description
+     * // 用于判断HDFS中某路径下是否已经存在文件夹，若存在则清空文件夹内文件，以免每次测试都需要手动删除文件夹内容
+     * // demo测试通过
+    */
     public static void CheckOutputPath(String outputPath) throws IOException {
 
         Configuration conf = new Configuration();
@@ -48,10 +48,14 @@ public class BayesTools {
         }
     }
 
-
-    // 读取指定文档中的每一列，将第一列作为Key值，其他列作为Value，返回HashMap数组
-    // 反正之后都要转换成其他类型，索性全都读取成String类型
-    // demo测试通过
+    /**
+     * @Param [(String)filePath, (Configuration)conf, (String)separator]
+     * @Return java.util.HashMap[]
+     * @Description
+     * // 读取指定文档中的每一列，将第一列作为Key值，其他列作为Value，返回HashMap数组
+     * // 反正之后都要转换成其他类型，索性全都读取成String类型
+     * // demo测试通过
+    */
     public static HashMap[] getKeyValuesByReadFile(String filePath, Configuration conf, String separator)
             throws IOException {
 
@@ -118,7 +122,12 @@ public class BayesTools {
     private static HashMap<String, String> fileClassAndWordToPossibility = null; // 测试集文档类别-单词到条件概率的映射
     private static int sumOfTrainSetFiles = 0;// 训练集中文档总数，用于计算文档类别的先验概率
     private static int sumOfTestSetFiles = 0;// 测试集中文档总数，用于计算宏平均评价矩阵
-
+    /**
+     * @Param [(String)filePath1, (String)filePath2, (Configuration)configuration]
+     * @Return void
+     * @Description
+     * //对各种计算工具进行初始化
+    */
     private static void Init(String filePath1, String filePath2, Configuration configuration) throws IOException {
         // 通过读取第一个文档，获取文档类别到单词总数、文档类别到文档总数的映射
         // 通过读取第二个文档，获取文档类别-单词到条件概率的映射
@@ -136,8 +145,12 @@ public class BayesTools {
         }
     }
 
-
-    // 使用已经训练好的模型对整个测试集进行分类，并建立评价矩阵，然后控制台输出评估分类结果
+    /**
+     * @Param [(String)TranSetPath]
+     * @Return void
+     * @Description
+     * // 使用已经训练好的模型对整个测试集进行分类，并建立评价矩阵，然后控制台输出评估分类结果
+    */
     public static void BayesClassifier(String TranSetPath) throws IOException {
 
         // 第一个参数为测试集HDFS路径，第二参数为输出文件HDFS路径，即对于分类的整体评价
@@ -257,13 +270,11 @@ public class BayesTools {
     }
 
     /**
-     * 本方法用于判断某单个文件属于哪个类别
-     *
-     * @param filePath
-     * @param configuration
-     * @return
-     * @throws IOException
-     */
+     * @Param [filePath, configuration]
+     * @Return java.lang.String
+     * @Description
+     * // 本方法用于判断某单个文件属于哪个类别
+    */
     public static String Classifier(Path filePath, Configuration configuration) throws IOException {
         String fileJudgedClass = null;// 判定类别
         double prob = -Double.MAX_VALUE; // 相对概率，先取double数据类型负数范围的最小值
@@ -279,14 +290,11 @@ public class BayesTools {
     }
 
     /**
-     * 本方法用于计算某个文档在某个类别中出现的相对概率
-     *
-     * @param filePath
-     * @param fileClass
-     * @param configuration
-     * @return
-     * @throws IOException
-     */
+     * @Param [filePath, fileClass, configuration]
+     * @Return double
+     * @Description
+     * // 本方法用于计算某个文档在某个类别中出现的相对概率
+    */
     public static double getRelativePosibility(Path filePath, String fileClass, Configuration configuration) throws IOException {
 
         double prob = 1; // 当前文档在当前类别中出现的条件概率

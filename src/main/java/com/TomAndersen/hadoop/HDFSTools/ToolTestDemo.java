@@ -82,14 +82,22 @@ public class ToolTestDemo {
         }
         System.out.println();*/
 
-        // 测试BayesClassifier，对整个测试集进行分类
-        // 获取配置信息
-        Configuration configuration = new Configuration();
+        // 测试BayesClassifier，对整个测试集进行分类（测试成功）
         // 测试集路径
         String TrainSetPath = "src/Input/TestSet";
         // 启动分类器
-        BayesTools.BayesClassifier(TrainSetPath, configuration);
-        double x = 0;
+        BayesTools.BayesClassifier(TrainSetPath);
+
+
+        /*// 测试PPT上的实例文档分类过程
+        // 获取配置信息
+        Configuration configuration = new Configuration();
+        // 获取文件路径
+        Path path = new Path("src/Input/TestSet1/555.txt");
+        BayesTools.Init(JobsInitiator.Job2_OutputPath, JobsInitiator.Job3_OutputPath, configuration);
+        System.out.println("p(c=yes|d5): " + BayesTools.getRelativePosibility(path, "yes", configuration));
+        System.out.println("p(c=no|d5): " + BayesTools.getRelativePosibility(path, "no", configuration));*/
+
 
     }
 }

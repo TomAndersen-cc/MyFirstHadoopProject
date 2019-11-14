@@ -1,12 +1,13 @@
 package com.TomAndersen.hadoop.HDFSTools;
 
+import com.TomAndersen.hadoop.BayesClassification.JobsInitiator;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FSDataInputStream;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.*;
+import org.apache.hadoop.io.IOUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.util.Arrays;
@@ -26,14 +27,15 @@ public class ToolTestDemo {
         // 而应该写成/的形式，如：D:/TestData/Document1
         BayesTools.CheckOutputPath(uri);*/
 
-        // 测试getKeyValuesByReadFile方法
+        /*// 测试getKeyValuesByReadFile方法
         Configuration configuration = new Configuration();
         HashMap[] myMaps = null;
-        String filePath = "C:/Users/DELL/Desktop/HadoopProjects/Job2-part-r-00000";
-        myMaps = BayesTools.getKeyValuesByReadFile(filePath, configuration,"\t");
+        String filePath = JobsInitiator.Job2_OutputPath + "part-r-00000";
+        myMaps = BayesTools.getKeyValuesByReadFile(filePath, configuration, "\t");
         for (HashMap map : myMaps) {
             System.out.println(map);
-        }
+        }*/
+
         /*FSDataInputStream fsDataInputStream = null;
         InputStreamReader inputStreamReader = null;
         BufferedReader bufferedReader = null;
@@ -57,6 +59,37 @@ public class ToolTestDemo {
                 bufferedReader.close();
             }
         }*/
+
+
+        /*// 尝试一次性读取HDFS文件中所有内容(测试成功)
+        String remoteSrc = JobsInitiator.Job1_OutputPath + "/part-r-00000"; // 设置读取路径
+        Configuration configuration = new Configuration(); // 获取配置信息
+        FileSystem fs = FileSystem.get(configuration); // 获取配置信息对应的文件系统
+        FileStatus fileStatus = fs.getFileStatus(new Path(remoteSrc));
+
+        InputStream in = null; // 打开文件获取输入流
+        try {
+            in = fs.open(fileStatus.getPath());
+            // 方式1：直接将输入流拷贝到系统输出流中
+            // IOUtils.copyBytes(in, System.out, fileStatus.getLen(), false);
+            // 方式2：将输入流拷贝到缓冲区，然后输出
+            byte[] buffer = new byte[(int) fileStatus.getLen()];
+            IOUtils.readFully(in, buffer, 0, buffer.length);
+            System.out.println(new String(buffer));//
+
+        } finally {
+            IOUtils.closeStream(in);
+        }
+        System.out.println();*/
+
+        // 测试BayesClassifier，对整个测试集进行分类
+        // 获取配置信息
+        Configuration configuration = new Configuration();
+        // 测试集路径
+        String TrainSetPath = "src/Input/TestSet";
+        // 启动分类器
+        BayesTools.BayesClassifier(TrainSetPath, configuration);
+        double x = 0;
 
     }
 }

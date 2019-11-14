@@ -17,14 +17,19 @@ import java.util.Set;
 
 
 /**
- * @Author
- * @Version
+ * @Author Tom
+ * @Version 1.0
  * @Date 2019/11/5
  * 切记：工具包和调用者之间应该是绝对的低耦合，各种参数都应该由调用者决定
  */
 public class BayesTools {
-    // demo测试通过
-    // 用于判断HDFS中某路径下是否已经存在文件夹，若存在则清空文件夹内文件，以免每次测试都需要手动删除文件夹内容
+    /**
+     * 用于判断HDFS中某路径下是否已经存在文件夹，若存在则清空文件夹内文件，以免每次测试都需要手动删除文件夹内容
+     * demo测试通过
+     *
+     * @param outputPath
+     * @throws IOException
+     */
     public static void CheckOutputPath(String outputPath) throws IOException {
 
         Configuration conf = new Configuration();
@@ -121,18 +126,23 @@ public class BayesTools {
         HashMap[] hashMaps_1 = BayesTools.getKeyValuesByReadFile(filePath1 + "part-r-00000", configuration, "\t");
         HashMap[] hashMaps_2 = BayesTools.getKeyValuesByReadFile(filePath2 + "part-r-00000", configuration, "\t");
         // 因为之前Job的输出内容都是已知的，所以此函数的读取也是已知的，直接赋值即可
-        // 要想避免这些类型未检查的warn，可以尝试直接全都换成object类型，然后使用的时候进行强转成String
         BayesTools.fileClassToSumOfWords = hashMaps_1[0];
         BayesTools.fileClassToSumOfFiles = hashMaps_1[1];
         BayesTools.fileClassAndWordToPossibility = hashMaps_2[0];
-
+        // 初始化训练集文档总数
+        Set<String> fileClasses = BayesTools.fileClassToSumOfFiles.keySet();// 获取所有的文档类别
+        for (String fileClass : fileClasses) {
+            BayesTools.sumOfTrainSetFiles += Integer.valueOf(BayesTools.fileClassToSumOfFiles.get(fileClass));
+        }
     }
 
 
     // 使用已经训练好的模型对整个测试集进行分类，并建立评价矩阵，然后控制台输出评估分类结果
-    public static void BayesClassifier(String TranSetPath, Configuration configuration) throws IOException {
+    public static void BayesClassifier(String TranSetPath) throws IOException {
 
         // 第一个参数为测试集HDFS路径，第二参数为输出文件HDFS路径，即对于分类的整体评价
+        // 获取配置信息
+        Configuration configuration = new Configuration();
         // 在读取之前务必进行数据初始化，即调用Init函数
         BayesTools.Init(JobsInitiator.Job2_OutputPath, JobsInitiator.Job3_OutputPath, configuration);
         // 对每个类别构建评价矩阵
@@ -159,7 +169,7 @@ public class BayesTools {
         // 初始化各种统计辅助工具
         for (String fileClass : fileClasses) {
             // 统计训练集中所有文档数量，用于计算单词缺省概率
-            BayesTools.sumOfTrainSetFiles += Integer.valueOf(BayesTools.fileClassToSumOfFiles.get(fileClass));
+            // BayesTools.sumOfTrainSetFiles += Integer.valueOf(BayesTools.fileClassToSumOfFiles.get(fileClass));
             int[][] matrix = new int[][]{{0, 0}, {0, 0}};// 定义时初始化数组
             classEvaluationMatrix.put(fileClass, matrix);// 初始化各类别评价矩阵
             classToSumOfTestSetFiles.put(fileClass, 0);// 初始化各类别文档数量
@@ -211,8 +221,6 @@ public class BayesTools {
             microPrecision += (double) (matix[0][0]) / (matix[0][0] + matix[1][0]);
             // 计算召回率recall = TP/(TP+FN)
             microRecall += (double) (matix[0][0]) / (matix[0][0] + matix[0][1]);
-            // 计算F1分数F1 = 2*precision*recall/(precision+recall)
-            microF1 += 2 * microPrecision * microRecall / (microPrecision + microRecall);
         }
         // 计算评价指标TP=[0][0],FP=[1][0],FN=[0][1],TN=[1][1]
         // 计算宏平均评价指标
@@ -230,7 +238,8 @@ public class BayesTools {
         microAccuracy /= fileClasses.size();
         microPrecision /= fileClasses.size();
         microRecall /= fileClasses.size();
-        microF1 /= fileClasses.size();
+        // 计算F1分数F1 = 2*precision*recall/(precision+recall)
+        microF1 = 2 * microPrecision * microRecall / (microPrecision + microRecall);
 
         // 输出评价指标
         System.out.println("宏平均评价指标：");
@@ -247,7 +256,14 @@ public class BayesTools {
 
     }
 
-    // 本方法用于判断某单个文件属于哪个类别
+    /**
+     * 本方法用于判断某单个文件属于哪个类别
+     *
+     * @param filePath
+     * @param configuration
+     * @return
+     * @throws IOException
+     */
     public static String Classifier(Path filePath, Configuration configuration) throws IOException {
         String fileJudgedClass = null;// 判定类别
         double prob = -Double.MAX_VALUE; // 相对概率，先取double数据类型负数范围的最小值
@@ -262,10 +278,18 @@ public class BayesTools {
         return fileJudgedClass;
     }
 
-    // 本方法用于计算某个文档在某个类别中出现的相对概率
+    /**
+     * 本方法用于计算某个文档在某个类别中出现的相对概率
+     *
+     * @param filePath
+     * @param fileClass
+     * @param configuration
+     * @return
+     * @throws IOException
+     */
     public static double getRelativePosibility(Path filePath, String fileClass, Configuration configuration) throws IOException {
 
-        double prob = 0; // 当前文档在当前类别中出现的条件概率
+        double prob = 1; // 当前文档在当前类别中出现的条件概率
         FileSystem fileSystem = FileSystem.get(configuration); // 获取文件系统
         FileStatus fileStatus = fileSystem.getFileStatus(filePath); // 获取文件状态信息
         int fileLength = (int) fileStatus.getLen(); // 获取文件大小
@@ -297,11 +321,13 @@ public class BayesTools {
             // 如果没有这个单词则使用默认条件概率
             // 如果存在这个单词，则直接取相应条件概率
             prob += temp == null ? Math.log(defaultProbability) : Math.log(Double.valueOf(temp));
+            //prob *= temp == null ? (defaultProbability) : (Double.valueOf(temp));
         }
-        // 还要算上各类别文档的先验概率
+        // 还要算上此类别文档的先验概率
         int numOfClassTrainFile = Integer.valueOf(BayesTools.fileClassToSumOfFiles.get(fileClass));// 当前类别训练集文档数量
         prob += Math.log((double) numOfClassTrainFile / BayesTools.sumOfTrainSetFiles);// 算上当前类别文档的先验概率
-        // 以下代码不知道为何出现-infinity，问题出现在强转时
+        //prob *= (double) numOfClassTrainFile / BayesTools.sumOfTrainSetFiles;
+        // 以下代码出现-infinity，问题出现在强转时，要先转换分子，再进行除法运算，而不是先除后转
         // prob += Math.log((double) (numOfClassTrainFile / BayesTools.sumOfTrainSetFiles));// 算上当前类别文档的先验概率
         return prob;
     }

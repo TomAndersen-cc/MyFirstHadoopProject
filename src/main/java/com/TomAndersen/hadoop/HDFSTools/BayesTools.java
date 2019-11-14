@@ -118,8 +118,8 @@ public class BayesTools {
         // 通过读取第一个文档，获取文档类别到单词总数、文档类别到文档总数的映射
         // 通过读取第二个文档，获取文档类别-单词到条件概率的映射
         // 在本次实现中，第一个文档路径为Job2的输出路径，第二文档的路径为Job3的输出路径
-        HashMap[] hashMaps_1 = BayesTools.getKeyValuesByReadFile(filePath1, configuration, "\t");
-        HashMap[] hashMaps_2 = BayesTools.getKeyValuesByReadFile(filePath2, configuration, "\t");
+        HashMap[] hashMaps_1 = BayesTools.getKeyValuesByReadFile(filePath1 + "part-r-00000", configuration, "\t");
+        HashMap[] hashMaps_2 = BayesTools.getKeyValuesByReadFile(filePath2 + "part-r-00000", configuration, "\t");
         // 因为之前Job的输出内容都是已知的，所以此函数的读取也是已知的，直接赋值即可
         // 要想避免这些类型未检查的warn，可以尝试直接全都换成object类型，然后使用的时候进行强转成String
         BayesTools.fileClassToSumOfWords = hashMaps_1[0];
@@ -147,18 +147,18 @@ public class BayesTools {
         BayesTools.sumOfTestSetFiles = fileStatuses.length;
         // 宏平均评价矩阵：TP=[0][0],FP=[1][0],FN=[0][1],TN=[1][1]
         int[][] MacroAverage = new int[][]{{0, 0}, {0, 0}};
-        // 分类结果准确率
-        double accuracy = 0;
-        // 分类结果精确率
-        double precision = 0;
+        // 准确率
+        double macroAccuracy = 0, microAccuracy = 0;
+        // 精确率
+        double macroPrecision = 0, microPrecision = 0;
         // 召回率
-        double recall = 0;
+        double macroRecall = 0, microRecall = 0;
         // F1分数
-        double F1 = 0;
+        double macroF1 = 0, microF1 = 0;
 
         // 初始化各种统计辅助工具
         for (String fileClass : fileClasses) {
-            // 统计训练集中所有文档数量
+            // 统计训练集中所有文档数量，用于计算单词缺省概率
             BayesTools.sumOfTrainSetFiles += Integer.valueOf(BayesTools.fileClassToSumOfFiles.get(fileClass));
             int[][] matrix = new int[][]{{0, 0}, {0, 0}};// 定义时初始化数组
             classEvaluationMatrix.put(fileClass, matrix);// 初始化各类别评价矩阵
@@ -202,33 +202,58 @@ public class BayesTools {
             MacroAverage[0][1] += matix[0][1];
             MacroAverage[1][0] += matix[1][0];
             MacroAverage[1][1] += matix[1][1];
+
+            // 计算微平均评价指标
+            // 计算准确率accuracy = (TP+TN)/(TP+TN+FP+FN)
+            microAccuracy += (double) (matix[0][0] + matix[1][1]) /
+                    (matix[0][0] + matix[1][0] + matix[0][1] + matix[1][1]);
+            // 计算精确率precious = TP/(TP+FP)
+            microPrecision += (double) (matix[0][0]) / (matix[0][0] + matix[1][0]);
+            // 计算召回率recall = TP/(TP+FN)
+            microRecall += (double) (matix[0][0]) / (matix[0][0] + matix[0][1]);
+            // 计算F1分数F1 = 2*precision*recall/(precision+recall)
+            microF1 += 2 * microPrecision * microRecall / (microPrecision + microRecall);
         }
         // 计算评价指标TP=[0][0],FP=[1][0],FN=[0][1],TN=[1][1]
+        // 计算宏平均评价指标
         // 计算准确率accuracy = (TP+TN)/(TP+TN+FP+FN)
-        accuracy = (double) ((MacroAverage[0][0] + MacroAverage[1][1]) /
-                (MacroAverage[0][0] + MacroAverage[1][0] + MacroAverage[0][1] + MacroAverage[1][1]));
+        macroAccuracy = (double) (MacroAverage[0][0] + MacroAverage[1][1]) /
+                (MacroAverage[0][0] + MacroAverage[1][0] + MacroAverage[0][1] + MacroAverage[1][1]);
         // 计算精确率precious = TP/(TP+FP)
-        precision = (double) (MacroAverage[0][0]) / (MacroAverage[0][0] + MacroAverage[1][0]);
+        macroPrecision = (double) (MacroAverage[0][0]) / (MacroAverage[0][0] + MacroAverage[1][0]);
         // 计算召回率recall = TP/(TP+FN)
-        recall = (double) (MacroAverage[0][0]) / (MacroAverage[0][0] + MacroAverage[0][1]);
+        macroRecall = (double) (MacroAverage[0][0]) / (MacroAverage[0][0] + MacroAverage[0][1]);
         // 计算F1分数F1 = 2*precision*recall/(precision+recall)
-        F1 = 2 * precision * recall / (precision + recall);
+        macroF1 = 2 * macroPrecision * macroRecall / (macroPrecision + macroRecall);
+
+        // 计算微平均评价指标
+        microAccuracy /= fileClasses.size();
+        microPrecision /= fileClasses.size();
+        microRecall /= fileClasses.size();
+        microF1 /= fileClasses.size();
 
         // 输出评价指标
-        System.out.println("accuracy: " + accuracy);
-        System.out.println("precision: " + precision);
-        System.out.println("recall: " + recall);
-        System.out.println("F1: " + F1);
+        System.out.println("宏平均评价指标：");
+        System.out.println("Macro-Average Accuracy: " + macroAccuracy);
+        System.out.println("Macro-Average Precision: " + macroPrecision);
+        System.out.println("Macro-Average Recall:" + macroRecall);
+        System.out.println("Macro-Average F1: " + macroF1);
+
+        System.out.println("微平均评价指标：");
+        System.out.println("Micro-Average Accuracy: " + microAccuracy);
+        System.out.println("Micro-Average Precision: " + microPrecision);
+        System.out.println("Micro-Average Recall:" + microRecall);
+        System.out.println("Micro-Average F1: " + microF1);
 
     }
 
     // 本方法用于判断某单个文件属于哪个类别
     public static String Classifier(Path filePath, Configuration configuration) throws IOException {
         String fileJudgedClass = null;// 判定类别
-        double prob = Double.MIN_VALUE; // 相对概率
+        double prob = -Double.MAX_VALUE; // 相对概率，先取double数据类型负数范围的最小值
         Set<String> fileClasses = BayesTools.fileClassToSumOfFiles.keySet();// 获取所有类别
-        for (String fileClass : fileClasses) {
-            double temp = getRelativePosibility(filePath, fileClass, configuration);// 获取本文档在某个类别中出现的概率
+        for (String fileClass : fileClasses) {// 遍历类别
+            double temp = getRelativePosibility(filePath, fileClass, configuration);// 计算本文档在某个类别中出现的相对概率大小
             if (temp > prob) {// 取最大相对概率对应类别作为判定类别
                 prob = temp;
                 fileJudgedClass = fileClass;
@@ -261,11 +286,11 @@ public class BayesTools {
         }
         // 获取完字符串后，其中内容进行分词，并针对当前类别计算其概率
         String[] words = text.split("\r\n|\n|\r|\u0000+");
-        // 默认条件概率为1/当前类别单词总数
+        // 单词缺省条件概率为1/当前类别训练集文档单词总数
         double defaultProbability = 1 / Double.valueOf(BayesTools.fileClassToSumOfWords.get(fileClass));
         for (String word : words) {
             // 获取对应单词在当前类别中出现的条件概率，取log然后相加，注意log之后是负值
-            // 之所以去log，是因为浮点数直接相乘的话会有很大精度丢失
+            // 之所以取log，是因为浮点数直接相乘的话会有很大精度丢失，变乘法为加法相比之下能够有效地保留精度
             /*prob += Math.log(Double.valueOf(BayesTools.
                     fileClassAndWordToPossibility.getOrDefault(fileClass + "-" + word, null)));*/
             String temp = BayesTools.fileClassAndWordToPossibility.getOrDefault(fileClass + "-" + word, null);
@@ -275,7 +300,9 @@ public class BayesTools {
         }
         // 还要算上各类别文档的先验概率
         int numOfClassTrainFile = Integer.valueOf(BayesTools.fileClassToSumOfFiles.get(fileClass));// 当前类别训练集文档数量
-        prob += Math.log((double) (numOfClassTrainFile / BayesTools.sumOfTrainSetFiles));// 算上当前类别文档的先验概率
+        prob += Math.log((double) numOfClassTrainFile / BayesTools.sumOfTrainSetFiles);// 算上当前类别文档的先验概率
+        // 以下代码不知道为何出现-infinity，问题出现在强转时
+        // prob += Math.log((double) (numOfClassTrainFile / BayesTools.sumOfTrainSetFiles));// 算上当前类别文档的先验概率
         return prob;
     }
     // 还是那个问题，工具包应该和调用者尽可能的低耦合，所以这个程序还是不应该写在这个工具包中

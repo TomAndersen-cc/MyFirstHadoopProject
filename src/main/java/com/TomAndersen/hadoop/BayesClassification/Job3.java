@@ -36,7 +36,7 @@ import java.util.HashMap;
  */
 public class Job3 extends Configured implements Tool {
 
-    private static HashMap fileClassToSumOfWords = null;// 存放文档类别到单词总数的映射，键值对类型为<String,String>
+    // public static HashMap fileClassToSumOfWords = null;// 存放文档类别到单词总数的映射，键值对类型为<String,String>
     // public static HashMap fileClassToSumOfFiles = null;// 存放文档类别到文档总数的映射
 
     @Override
@@ -44,12 +44,12 @@ public class Job3 extends Configured implements Tool {
 
         // 获取配置信息
         Configuration configuration = new Configuration();
-        // 读取Job2的输出文件，获取文档类别到单词总数的映射
+        /*// 读取Job2的输出文件，获取文档类别到单词总数的映射
         HashMap[] myMaps = BayesTools.getKeyValuesByReadFile(JobsInitiator.Job2_OutputPath + "part-r-00000",
                 configuration, "\t");
         // 因为知道文档输出类型及内容，所以直接取第一个Map即可
         fileClassToSumOfWords = myMaps[0];
-        // fileClassToSumOfFiles = myMaps[1];
+        // fileClassToSumOfFiles = myMaps[1];*/
 
         //下面是对Job3的配置
         String InputPath = args[0]; // 输入路径为Job1的输出路径
@@ -81,9 +81,21 @@ public class Job3 extends Configured implements Tool {
 
         private final static Text KEYOUT = new Text();//预定义KeyOut，避免多次New
         private final static DoubleWritable VALUEOUT = new DoubleWritable();//预定义ValueOut，避免多次New
+        private static HashMap fileClassToSumOfWords = null;// 存放文档类别到单词总数的映射，键值对类型为<String,String>
+
+        // 重载setup方法，在setup方法中初始化fileClassToSumOfWords，setup方法每次启动Task时由run方法调用，只执行一次
+        @Override
+        public void setup(Context context) throws IOException, InterruptedException {
+            super.setup(context);
+            Configuration configuration = context.getConfiguration();
+            HashMap[] myMaps = BayesTools.getKeyValuesByReadFile(JobsInitiator.Job2_OutputPath + "part-r-00000",
+                    configuration, "\t");
+            fileClassToSumOfWords = myMaps[0];
+        }
 
         // 输入：<NullWritable，<文档类别   单词  单词总数>>
         // 输出：<文档类别 单词  条件概率>
+        @Override
         public void map(LongWritable KeyIn, Text ValueIn, Context context)
                 throws IOException, InterruptedException {
 
@@ -95,7 +107,7 @@ public class Job3 extends Configured implements Tool {
             Double sumOfWords = Double.valueOf(ValuesIn[2]);// 获取当前单词总数
             // 获取对应类别所有单词的总数
             Double sumOfClassWord = Double.valueOf((String)
-                    Job3.fileClassToSumOfWords.get(fileClass));
+                    Job3Mapper.fileClassToSumOfWords.get(fileClass));
             // 计算单词的条件概率
             // 设置输出的Key值，为<文档类别 单词>
             KEYOUT.set(fileClass + "-" + word);

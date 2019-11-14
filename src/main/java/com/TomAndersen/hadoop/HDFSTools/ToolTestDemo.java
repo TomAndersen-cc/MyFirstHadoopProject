@@ -84,7 +84,7 @@ public class ToolTestDemo {
 
         // 测试BayesClassifier，对整个测试集进行分类（测试成功）
         // 测试集路径
-        String TrainSetPath = "src/Input/TestSet";
+        String TrainSetPath = args[0];
         // 启动分类器
         BayesTools.BayesClassifier(TrainSetPath);
 

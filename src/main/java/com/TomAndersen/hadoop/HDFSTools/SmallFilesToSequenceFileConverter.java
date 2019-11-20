@@ -4,7 +4,6 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.BytesWritable;
-import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
@@ -45,7 +44,8 @@ public class SmallFilesToSequenceFileConverter extends Configured implements Too
         job.setOutputValueClass(BytesWritable.class);
         // 设置Job采用的Mapper和Reducer
         job.setMapperClass(SequenceFileMapper.class);
-        job.setReducerClass(SequenceFileReducer.class);// 似乎可以不用设置Reducer，会采用默认的reducer
+        // 也可以不用设置Reducer，会采用默认的Reducer原样输出，反正都写了就设置一下吧
+        job.setReducerClass(SequenceFileReducer.class);
         // 设置输入输出路径
         FileInputFormat.setInputPaths(job, new Path(args[0]));
         FileOutputFormat.setOutputPath(job, new Path(args[1]));

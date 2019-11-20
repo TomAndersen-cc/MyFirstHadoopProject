@@ -168,16 +168,16 @@ public class BayesTools {
         FileStatus[] fileStatuses = fs.listStatus(new Path(TranSetPath));
         // 获取测试集文档总数
         BayesTools.sumOfTestSetFiles = fileStatuses.length;
-        // 宏平均评价矩阵：TP=[0][0],FP=[1][0],FN=[0][1],TN=[1][1]
-        int[][] MacroAverage = new int[][]{{0, 0}, {0, 0}};
+        // 微平均评价矩阵：TP=[0][0],FP=[1][0],FN=[0][1],TN=[1][1]
+        int[][] MicroAverageMatrix = new int[][]{{0, 0}, {0, 0}};
         // 准确率
-        double macroAccuracy = 0, microAccuracy = 0;
+        double microAccuracy = 0, macroAccuracy = 0;
         // 精确率
-        double macroPrecision = 0, microPrecision = 0;
+        double microPrecision = 0, macroPrecision = 0;
         // 召回率
-        double macroRecall = 0, microRecall = 0;
+        double microRecall = 0, macroRecall = 0;
         // F1分数
-        double macroF1 = 0, microF1 = 0;
+        double microF1 = 0, macroF1 = 0;
 
         // 初始化各种统计辅助工具
         for (String fileClass : fileClasses) {
@@ -220,39 +220,39 @@ public class BayesTools {
         // 求宏平均评价矩阵
         for (String fileClass : fileClasses) {
             // 将每个类别对应的评价矩阵各项求和
-            int[][] matix = classEvaluationMatrix.get(fileClass);
-            MacroAverage[0][0] += matix[0][0];
-            MacroAverage[0][1] += matix[0][1];
-            MacroAverage[1][0] += matix[1][0];
-            MacroAverage[1][1] += matix[1][1];
+            int[][] matrix = classEvaluationMatrix.get(fileClass);
+            MicroAverageMatrix[0][0] += matrix[0][0];
+            MicroAverageMatrix[0][1] += matrix[0][1];
+            MicroAverageMatrix[1][0] += matrix[1][0];
+            MicroAverageMatrix[1][1] += matrix[1][1];
 
-            // 计算微平均评价指标
+            // 计算宏平均评价指标
             // 计算准确率accuracy = (TP+TN)/(TP+TN+FP+FN)
-            microAccuracy += (double) (matix[0][0] + matix[1][1]) /
-                    (matix[0][0] + matix[1][0] + matix[0][1] + matix[1][1]);
+            macroAccuracy += (double) (matrix[0][0] + matrix[1][1]) /
+                    (matrix[0][0] + matrix[1][0] + matrix[0][1] + matrix[1][1]);
             // 计算精确率precious = TP/(TP+FP)
-            microPrecision += (double) (matix[0][0]) / (matix[0][0] + matix[1][0]);
+            macroPrecision += (double) (matrix[0][0]) / (matrix[0][0] + matrix[1][0]);
             // 计算召回率recall = TP/(TP+FN)
-            microRecall += (double) (matix[0][0]) / (matix[0][0] + matix[0][1]);
+            macroRecall += (double) (matrix[0][0]) / (matrix[0][0] + matrix[0][1]);
         }
         // 计算评价指标TP=[0][0],FP=[1][0],FN=[0][1],TN=[1][1]
-        // 计算宏平均评价指标
-        // 计算准确率accuracy = (TP+TN)/(TP+TN+FP+FN)
-        macroAccuracy = (double) (MacroAverage[0][0] + MacroAverage[1][1]) /
-                (MacroAverage[0][0] + MacroAverage[1][0] + MacroAverage[0][1] + MacroAverage[1][1]);
-        // 计算精确率precious = TP/(TP+FP)
-        macroPrecision = (double) (MacroAverage[0][0]) / (MacroAverage[0][0] + MacroAverage[1][0]);
-        // 计算召回率recall = TP/(TP+FN)
-        macroRecall = (double) (MacroAverage[0][0]) / (MacroAverage[0][0] + MacroAverage[0][1]);
-        // 计算F1分数F1 = 2*precision*recall/(precision+recall)
-        macroF1 = 2 * macroPrecision * macroRecall / (macroPrecision + macroRecall);
-
         // 计算微平均评价指标
-        microAccuracy /= fileClasses.size();
-        microPrecision /= fileClasses.size();
-        microRecall /= fileClasses.size();
+        // 计算准确率accuracy = (TP+TN)/(TP+TN+FP+FN)
+        microAccuracy = (double) (MicroAverageMatrix[0][0] + MicroAverageMatrix[1][1]) /
+                (MicroAverageMatrix[0][0] + MicroAverageMatrix[1][0] + MicroAverageMatrix[0][1] + MicroAverageMatrix[1][1]);
+        // 计算精确率precious = TP/(TP+FP)
+        microPrecision = (double) (MicroAverageMatrix[0][0]) / (MicroAverageMatrix[0][0] + MicroAverageMatrix[1][0]);
+        // 计算召回率recall = TP/(TP+FN)
+        microRecall = (double) (MicroAverageMatrix[0][0]) / (MicroAverageMatrix[0][0] + MicroAverageMatrix[0][1]);
         // 计算F1分数F1 = 2*precision*recall/(precision+recall)
         microF1 = 2 * microPrecision * microRecall / (microPrecision + microRecall);
+
+        // 计算宏平均评价指标
+        macroAccuracy /= fileClasses.size();
+        macroPrecision /= fileClasses.size();
+        macroRecall /= fileClasses.size();
+        // 计算F1分数F1 = 2*precision*recall/(precision+recall)
+        macroF1 = 2 * macroPrecision * macroRecall / (macroPrecision + macroRecall);
 
         // 输出评价指标
         System.out.println("宏平均评价指标：");

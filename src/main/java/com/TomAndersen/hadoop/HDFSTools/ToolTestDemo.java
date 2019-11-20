@@ -4,6 +4,7 @@ import com.TomAndersen.hadoop.BayesClassification.JobsInitiator;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.*;
 import org.apache.hadoop.io.IOUtils;
+import org.apache.hadoop.util.ToolRunner;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -20,7 +21,7 @@ import java.util.HashMap;
  * 用于测试工具包中的各个方法是否可用
  */
 public class ToolTestDemo {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
         // 测试CheckOutputPath方法
         /*String uri = "D:/TestData/Document1";
         // 记得使用String创建URI里面不能包含特殊字符，不能使用转义字符的形式如：D:\\TestData\\Document1
@@ -82,14 +83,21 @@ public class ToolTestDemo {
         }
         System.out.println();*/
 
-        // 测试BayesClassifier，对整个测试集进行分类（测试成功）
+        /*// 测试BayesClassifier，对整个测试集进行分类（测试成功）
         // 测试集路径
         String TrainSetPath = args[0];
         // 启动分类器
-        BayesTools.BayesClassifier(TrainSetPath);
+        BayesTools.BayesClassifier(TrainSetPath);*/
 
+        // 测试SequenceFile是否正常运行（测试成功）
+        String TrainSetInputPath = "src/Input/TestSet";
+        String SequnceFileOutputPath = "src/Output/SequenceFile/TrainSet";
+        BayesTools.CheckOutputPath(SequnceFileOutputPath);//检查SequenceFile输出路径是否为空
+        int exitCode = ToolRunner.run(new SmallFilesToSequenceFileConverter(),
+                new String[]{TrainSetInputPath, SequnceFileOutputPath});
+        System.exit(exitCode);
 
-        /*// 测试PPT上的实例文档分类过程
+        /*// 测试PPT上的实例文档分类过程（测试结果正确）
         // 获取配置信息
         Configuration configuration = new Configuration();
         // 获取文件路径

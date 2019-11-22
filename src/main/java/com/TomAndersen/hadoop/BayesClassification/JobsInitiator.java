@@ -12,17 +12,17 @@ import org.apache.hadoop.util.ToolRunner;
  */
 public class JobsInitiator {
 
-    // 单机测试下的本地文件系统相对路径
+    // 单机测试下的本地文件系统相对路径，千万注意此路径集群中不能使用，集群中路径前面需要加/
     public static final String Job1_OutputPath = "src/Output/Job1/";
-    public static final String Job2_OutputPath = "src/OutPut/Job2/";
-    public static final String Job3_OutputPath = "src/OutPut/Job3/";
-    public static final String Job4_OutputPath = "src/OutPut/Job4/";
+    public static final String Job2_OutputPath = "src/Output/Job2/";
+    public static final String Job3_OutputPath = "src/Output/Job3/";
+    public static final String Job4_OutputPath = "src/Output/Job4/";
 
     /*// 集群测试下的HDFS文件路径
-    public static final String Job1_OutputPath = "/Output/Job1";
-    public static final String Job2_OutputPath = "/OutPut/Job2/";
-    public static final String Job3_OutputPath = "/OutPut/Job3/";
-    public static final String Job4_OutputPath = "/OutPut/Job4/";*/
+    public static final String Job1_OutputPath = "/src/Output/Job1/";
+    public static final String Job2_OutputPath = "/src/Output/Job2/";
+    public static final String Job3_OutputPath = "/src/Output/Job3/";
+    public static final String Job4_OutputPath = "/src/Output/Job4/";*/
 
     public static void main(String[] args) throws Exception {
         // args中有两个参数，第一个为训练集，第二个为测试集

@@ -53,6 +53,8 @@ public class SmallFilesToSequenceFileConverter {
         job.setOutputKeyClass(Text.class);
         // 设置最终输出的Value类型
         job.setOutputValueClass(BytesWritable.class);
+        // 设置主类
+        job.setJarByClass(SmallFilesToSequenceFileConverter.class);//设置主类，必须要设置否则集群中不识别类
         // 设置Job采用的Mapper和Reducer
         job.setMapperClass(SequenceFileMapper.class);
         // 也可以不用设置Reducer，会采用默认的Reducer原样输出，反正都写了就设置一下吧

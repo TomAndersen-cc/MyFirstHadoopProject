@@ -67,7 +67,7 @@ public class SmallFilesToSequenceFileConverter {
 
     }
 
-    static class SequenceFileMapper extends Mapper<Text, BytesWritable, Text, BytesWritable> {
+    public static class SequenceFileMapper extends Mapper<Text, BytesWritable, Text, BytesWritable> {
         // 因为在WholeFileInputFormat中已经设置为传入的格式为<文件名，文件内容>
         // 所以在这里直接原样压入即可
         @Override
@@ -76,7 +76,7 @@ public class SmallFilesToSequenceFileConverter {
         }
     }
 
-    static class SequenceFileReducer extends Reducer<Text, BytesWritable, Text, BytesWritable> {
+    public static class SequenceFileReducer extends Reducer<Text, BytesWritable, Text, BytesWritable> {
         // 同样的Reducer也只是原样输出不作变换
         @Override
         protected void reduce(Text key, Iterable<BytesWritable> values, Context context) throws IOException, InterruptedException {

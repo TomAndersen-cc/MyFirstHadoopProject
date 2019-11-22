@@ -9,6 +9,7 @@ import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 
@@ -35,8 +36,10 @@ public class SmallFilesToSequenceFileConverter extends Configured implements Too
         Configuration configuration = new Configuration();
         // 创建Job
         Job job = Job.getInstance(configuration, this.getClass().getName());
-        // 使用整个文件作为记录输入，并将小文件尽量整合成一个Split
-        job.setInputFormatClass(CombineSmallfileInputFormat.class);
+
+        // 设置输入格式
+        //job.setInputFormatClass(WholeFileInputFormat.class);//使用整个文件内容作为记录输入
+        job.setInputFormatClass(CombineSmallfileInputFormat.class);//使用整合小文件block的方式输入
 
         // 使用自带的SequenceFileOutputFormat进行输出生成Sequence
         job.setOutputFormatClass(SequenceFileOutputFormat.class);

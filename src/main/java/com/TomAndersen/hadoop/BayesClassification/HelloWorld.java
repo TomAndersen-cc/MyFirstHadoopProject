@@ -31,7 +31,7 @@ public class HelloWorld {
 
         BytesWritable bytesWritable = new BytesWritable(bytes);
         System.out.println(bytesWritable);
-        Text text = new Text(bytesWritable.getBytes());
+        Text text = new Text(bytesWritable.copyBytes());
         System.out.println(text);
 
         System.out.println(SEPARATOR);
@@ -63,7 +63,7 @@ public class HelloWorld {
         myName = "TomAndersen";
         BytesWritable bytesWritable1 = new BytesWritable(myName.getBytes());
         System.out.println(bytesWritable1.toString());
-        System.out.println(new String(bytesWritable1.getBytes()));
+        System.out.println(new String(bytesWritable1.copyBytes()));
 
         // 测试系统退出状态是否只有非0和0两种选项，结果表面0代表正常退出，非0都代表不正常退出
         // System.exit(-4);
@@ -140,5 +140,34 @@ public class HelloWorld {
         // 其中double数据范围是关于原点对称的，其他数据类型同理
         double m = Double.MAX_VALUE;
         System.out.println(m);
+
+        // 测试String.split函数
+        System.out.println(SEPARATOR);
+        String temp1 = "\t\t";
+        String[] temps = temp1.split("\t");
+        System.out.println(temps.length);
+
+        // 测试BytesWritable的set方法与getBytes方法
+        System.out.println(SEPARATOR);
+        String temp2 = "0123456", temp3 = "456";
+        BytesWritable myBytes = new BytesWritable(temp2.getBytes());
+        System.out.println(Arrays.toString(temp2.getBytes()));
+        System.out.println(myBytes);
+        System.out.println(Arrays.toString(myBytes.getBytes()));
+        System.out.println(new String(myBytes.getBytes()));
+        System.out.println(Arrays.toString(myBytes.copyBytes()));
+        System.out.println(new String(myBytes.copyBytes()));
+
+        myBytes.set(temp3.getBytes(), 0, temp3.getBytes().length);
+        System.out.println(Arrays.toString(temp3.getBytes()));
+        System.out.println(myBytes);
+        System.out.println(Arrays.toString(myBytes.getBytes()));
+        System.out.println(new String(myBytes.getBytes()));
+        System.out.println(Arrays.toString(myBytes.copyBytes()));
+        System.out.println(new String(myBytes.copyBytes()));
+        // 实验结果说明不能使用getBytes方法来获取BytesWritable，很明显其缓冲区大小一直没变
+        // 实验结果说明必须使用copyBytes来获取BytesWritable中实际存储的字节
+
+
     }
 }

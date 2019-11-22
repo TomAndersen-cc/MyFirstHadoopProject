@@ -1,6 +1,7 @@
 package com.TomAndersen.hadoop.BayesClassification;
 
 import com.TomAndersen.hadoop.HDFSTools.CombineSmallfileInputFormat;
+import com.TomAndersen.hadoop.HDFSTools.WholeFileInputFormat;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
@@ -11,6 +12,8 @@ import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.FileSplit;
+import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
 
@@ -20,8 +23,7 @@ import java.io.IOException;
  * @Author
  * @Version
  * @Date 2019/11/4
- * @Description
- * Job1：统计出各类文档中各种单词的数目
+ * @Description Job1：统计出各类文档中各种单词的数目
  * Job1:
  * 将一个文档作为一个记录处理
  * 输入路径：训练集
@@ -45,8 +47,10 @@ public class Job1 extends Configured implements Tool {
         Configuration configuration = new Configuration();
         Job job = Job.getInstance(configuration, this.getClass().getName());
 
-        //job.setInputFormatClass(WholeFileInputFormat.class);//设置输入格式
-        job.setInputFormatClass(CombineSmallfileInputFormat.class);//设置输入格式
+        // 设置输入格式
+        //job.setInputFormatClass(WholeFileInputFormat.class);//使用整个文件内容作为记录输入
+        //job.setInputFormatClass(CombineSmallfileInputFormat.class);//使用整合小文件block的方式输入
+        job.setInputFormatClass(SequenceFileInputFormat.class);//使用SequenceFile作为输入
 
         job.setJarByClass(Job1.class);//设置主类
 
@@ -81,12 +85,19 @@ public class Job1 extends Configured implements Tool {
                 throws IOException, InterruptedException {//KeyIn是文档名，ValueIn是文档内容
             // Text, BytesWritable, Text, IntWritable输入输出键值对类型
             // 将文档内容按照回车分割，即分割成一个个单词
-            String[] contents = new String(ValueIn.getBytes()).split("\r\n|\n|\r|\u0000+");
-            // 以各种系统的换行形式以及Unicode字符的null作为分隔符进行切分
+            String[]  contents = new String(ValueIn.copyBytes()).split("\r\n|\n|\t|\u0000+");
+            // 以各种系统的换行形式、制表符以及Unicode字符的null作为分隔符进行切分
             // 不知道为什么原数据集中那么多Unicode的空
+
+            /*// 也可以使用以下方式获取文件名，但这样就无法使用CombineInputFormat
+            // 因为CombineFileSplit无法转换成FileSplit
+            FileSplit fileSplit = (FileSplit) context.getInputSplit();
+            String filename = fileSplit.getPath().getName();
+            String fileClass = filename.split("-")[0];*/
 
             // 获取文档类别，文档名中已有类别戳
             String fileClass = KeyIn.toString().split("-")[0];
+
 
             for (String word : contents) {
                 // 对每个单词加上类别名
@@ -94,6 +105,7 @@ public class Job1 extends Configured implements Tool {
                 //输出格式为<类别名 单词，“1”>
                 context.write(KEYOUT, VALUEOUT);
             }
+
         }
     }
 

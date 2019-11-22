@@ -44,24 +44,24 @@ public class JobsInitiator {
         }
 
         // 第一个参数为训练集文档路径
-        final String TranDataSetPath = args[0];
+        final String TrainDataSetPath = args[0];
         // final String TestDataSetPath = args[1];
-
+        int JobexitCode = 0;
         BayesTools.CheckOutputPath(Job1_OutputPath);//检查Job1输出路径是否为空
-        int Job1exitCode = ToolRunner.run(new Job1(), new String[]{TranDataSetPath, Job1_OutputPath});
+        JobexitCode += ToolRunner.run(new Job1(), new String[]{TrainDataSetPath, Job1_OutputPath});
         //int Job1exitCode = 0;
         // System.exit(Job1exitCode);// 当参数为0时表示正常终止JVM，为非0时表示异常终止
 
 
         BayesTools.CheckOutputPath(Job2_OutputPath);//检查Job2输出路径是否为空
-        int Job2exitCode = ToolRunner.run(new Job2(), new String[]{TranDataSetPath, Job2_OutputPath});
+        JobexitCode += ToolRunner.run(new Job2(), new String[]{TrainDataSetPath, Job2_OutputPath});
         //int Job2exitCode = 0;
         //System.exit(Job2exitCode);// 当参数为0时表示正常终止JVM，为非0时表示异常终止
 
         BayesTools.CheckOutputPath(Job3_OutputPath);//检查Job2输出路径是否为空
-        int Job3exitCode = ToolRunner.run(new Job3(), new String[]{Job1_OutputPath, Job3_OutputPath});
+        JobexitCode += ToolRunner.run(new Job3(), new String[]{Job1_OutputPath, Job3_OutputPath});
 
-        System.exit(Job1exitCode + Job2exitCode + Job3exitCode);// 当参数为0时表示正常终止JVM，为非0时表示异常终止
+        System.exit(JobexitCode);// 当参数为0时表示正常终止JVM，为非0时表示异常终止
 
         // 使用训练好的模型进行分类
         // BayesTools.BayesClassifier(TestDataSetPath);

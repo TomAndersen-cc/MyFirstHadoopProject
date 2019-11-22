@@ -1,6 +1,7 @@
 package com.TomAndersen.hadoop.BayesClassification;
 
 import com.TomAndersen.hadoop.HDFSTools.CombineSmallfileInputFormat;
+import com.TomAndersen.hadoop.HDFSTools.WholeFileInputFormat;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
@@ -11,6 +12,7 @@ import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
 
@@ -43,8 +45,10 @@ public class Job2 extends Configured implements Tool {
         Configuration configuration = new Configuration();
         Job job = Job.getInstance(configuration, this.getClass().getName());
 
-        // 设置输入格式,使用整合小文件block的方式输入
-        job.setInputFormatClass(CombineSmallfileInputFormat.class);
+        // 设置输入格式
+        //job.setInputFormatClass(WholeFileInputFormat.class);//使用整个文件内容作为记录输入
+        //job.setInputFormatClass(CombineSmallfileInputFormat.class);//使用整合小文件block的方式输入
+        job.setInputFormatClass(SequenceFileInputFormat.class);//使用SequenceFile作为输入
 
         job.setJarByClass(Job2.class);//设置主类
 
@@ -78,7 +82,7 @@ public class Job2 extends Configured implements Tool {
         public void map(Text KeyIn, BytesWritable ValueIn, Context context)
                 throws IOException, InterruptedException {
             // 对整个文档内容按回车、换行、空字符进行分割，分割产生的碎片数量即为本文档中单词总数
-            String[] contents = new String(ValueIn.getBytes()).split("\r\n|\n|\r|\u0000+");
+            String[] contents = new String(ValueIn.copyBytes()).split("\r\n|\n|\r|\u0000+");
             // 本文档单词总数作为ValueOut
             VALUEOUT.set(contents.length);
 

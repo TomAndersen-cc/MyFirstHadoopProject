@@ -62,7 +62,7 @@ public class CombineSmallfileRecordReader extends RecordReader<Text, BytesWritab
 
     @Override
     public BytesWritable getCurrentValue() throws IOException, InterruptedException {
-        byte[] contents = wholeFileRecordReader.getCurrentValue().getBytes();
+        byte[] contents = wholeFileRecordReader.getCurrentValue().copyBytes();
         currentValue.set(contents, 0, contents.length);
         return this.currentValue;
     }

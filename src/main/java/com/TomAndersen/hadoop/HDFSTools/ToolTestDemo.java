@@ -85,12 +85,12 @@ public class ToolTestDemo {
 
         /*// 测试BayesClassifier，对整个测试集进行分类（测试成功）
         // 测试集路径
-        String TrainSetPath = args[0];
+        String TestSetPath = args[0];
         // 启动分类器
-        BayesTools.BayesClassifier(TrainSetPath);*/
+        BayesTools.BayesClassifier(TestSetPath);*/
 
-        // 测试SequenceFile是否正常运行（测试成功）
-        String TrainSetInputPath = "src/Input/TestSet";
+        // 测试SequenceFile写入是否正常运行（测试成功）
+        String TrainSetInputPath = "src/Input/TrainSet";
         String SequnceFileOutputPath = "src/Output/SequenceFile/TrainSet";
         BayesTools.CheckOutputPath(SequnceFileOutputPath);//检查SequenceFile输出路径是否为空
         int exitCode = ToolRunner.run(new SmallFilesToSequenceFileConverter(),

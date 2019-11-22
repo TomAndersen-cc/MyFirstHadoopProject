@@ -42,7 +42,7 @@ public class TokenizerMapper
         //将读取的一行Text文本转化为Java的字符串String类型
 
         //String line = ValueIn.toString();
-        String line = new String(ValueIn.getBytes());
+        String line = new String(ValueIn.copyBytes());
         //按照空格符切分出一行字符串中包含的所有单词，并存储到字符串数组中
         String[] words = line.split("\r\n|\n|\r|\u0000+");
         //循环遍历字符串数组words，将其中的每个单词作为KeyOut值，上面定义的IntWritable类型常量WORD_VALUE作为ValueOut值

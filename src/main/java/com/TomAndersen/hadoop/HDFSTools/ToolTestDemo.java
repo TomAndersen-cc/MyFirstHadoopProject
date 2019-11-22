@@ -83,19 +83,21 @@ public class ToolTestDemo {
         }
         System.out.println();*/
 
-        /*// 测试BayesClassifier，对整个测试集进行分类（测试成功）
-        // 测试集路径
-        String TestSetPath = args[0];
-        // 启动分类器
-        BayesTools.BayesClassifier(TestSetPath);*/
-
-        // 测试SequenceFile写入是否正常运行（测试成功）
-        String TrainSetInputPath = "src/Input/TrainSet";
-        String SequnceFileOutputPath = "src/Output/SequenceFile/TrainSet";
+        /*// 测试SequenceFile写入是否正常运行（测试成功，原类已经更改，此测试无效）
+        String TrainSetInputPath = "src/Input/TrainSet1";
+        String SequnceFileOutputPath = "src/Output/SequenceFile/TrainSet1";
         BayesTools.CheckOutputPath(SequnceFileOutputPath);//检查SequenceFile输出路径是否为空
         int exitCode = ToolRunner.run(new SmallFilesToSequenceFileConverter(),
                 new String[]{TrainSetInputPath, SequnceFileOutputPath});
-        System.exit(exitCode);
+        System.exit(exitCode);*/
+
+        // 测试BayesClassifier，对整个测试集进行分类（测试成功）
+        // 测试集路径
+        String TestSetPath = args[0];
+        // 启动分类器
+        BayesTools.BayesClassifier(TestSetPath);
+
+
 
         /*// 测试PPT上的实例文档分类过程（测试结果正确）
         // 获取配置信息

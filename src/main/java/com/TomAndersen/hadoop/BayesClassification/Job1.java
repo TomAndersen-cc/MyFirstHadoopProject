@@ -57,7 +57,7 @@ public class Job1 extends Configured implements Tool {
         job.setCombinerClass(Job1Reducer.class);// 设置Combiner
         job.setReducerClass(Job1Reducer.class);// 设置Reducer
 
-        // 默认使用的OutputFormat是TextOutputFormat，使用时一定要指定Map输出的Key-Value类型
+        // 默认使用的OutputFormat是TextOutputFormat，使用时一定要指定Map和Reduce输出的Key-Value类型
         job.setMapOutputKeyClass(Text.class);
         job.setMapOutputValueClass(IntWritable.class);
 

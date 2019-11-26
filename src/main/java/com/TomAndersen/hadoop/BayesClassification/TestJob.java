@@ -36,7 +36,7 @@ import java.io.IOException;
  * 输入：<文档类别 单词，{1,1,1,1,1,1……}>，输出：<文档类别-单词，sum>
  */
 
-// 用于测试TextPair是否能够正常使用的TestJob
+// 用于测试TextPair是否能够正常使用的TestJob（测试成功，注意：TextPair中的first和second是使用制表符间隔）
 public class TestJob extends Configured implements Tool {
 
     @Override

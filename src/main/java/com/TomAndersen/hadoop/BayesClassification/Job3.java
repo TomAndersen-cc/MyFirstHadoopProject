@@ -20,12 +20,12 @@ import java.util.HashMap;
  * @Version
  * @Date 2019/11/8
  * Job3：
- * 在Job3的run函数中读取Job2的输出路径下的HDFS文档，将其中的文档类别和单词总数作为键值对压入Job3类的静态
+ * 在Job3的setup函数中读取Job2的输出路径下的HDFS文档，将其中的文档类别和单词总数作为键值对压入Job3类的静态
  * HashMap中，读入的文档名为含有"part"，可以使用正则表达式进行匹配。
  * （改：直接读取Job2输出的part文档，因为分类最多也不会超出Reducetask设置的默认阈值上限，保险起见手动设置
  * ReduceTask的数量，保证输出的part文件只有一个，直接读取指定文件，而不读取文件夹路径，读取文件夹路径还需
  * 要进一步判断	，十分麻烦）
- * <p>
+ *
  * 输入路径：Job1的输出路径（MapReduce程序会自动忽略以下划线"_"开头的文件，不用担心_success文件）
  * 输出路径：自定义Job3输出路径，如：/OutPut/Job3/
  * Mapper：
@@ -44,13 +44,6 @@ public class Job3 extends Configured implements Tool {
 
         // 获取配置信息
         Configuration configuration = new Configuration();
-        /*// 读取Job2的输出文件，获取文档类别到单词总数的映射
-        HashMap[] myMaps = BayesTools.getKeyValuesByReadFile(JobsInitiator.Job2_OutputPath + "part-r-00000",
-                configuration, "\t");
-        // 因为知道文档输出类型及内容，所以直接取第一个Map即可
-        fileClassToSumOfWords = myMaps[0];
-        // fileClassToSumOfFiles = myMaps[1];*/
-
         //下面是对Job3的配置
         String InputPath = args[0]; // 输入路径为Job1的输出路径
         String OutputPath = args[1];// 输出路径
@@ -98,9 +91,8 @@ public class Job3 extends Configured implements Tool {
         @Override
         public void map(LongWritable KeyIn, Text ValueIn, Context context)
                 throws IOException, InterruptedException {
-
             // 对输入的一行文本数据按制表符 \t 进行分割
-            // KeyIn格式为<文档类别 单词  单词总数>，ValueIn为空
+            // ValueIn格式为<文档类别  单词  单词总数>，KeyIn为记录偏移量
             String[] ValuesIn = ValueIn.toString().split("\t");
             String fileClass = ValuesIn[0];// 获取文档类别
             String word = ValuesIn[1];// 获取当前单词
@@ -109,7 +101,7 @@ public class Job3 extends Configured implements Tool {
             Double sumOfClassWord = Double.valueOf((String)
                     Job3Mapper.fileClassToSumOfWords.get(fileClass));
             // 计算单词的条件概率
-            // 设置输出的Key值，为<文档类别 单词>
+            // 设置输出的Key值，为<文档类别-单词>，虽然实现了TextPair，为了便于后续读取还是直接用“-”分割
             KEYOUT.set(fileClass + "-" + word);
             // 设置输出的Value值，为单词条件概率
             VALUEOUT.set(sumOfWords / sumOfClassWord);

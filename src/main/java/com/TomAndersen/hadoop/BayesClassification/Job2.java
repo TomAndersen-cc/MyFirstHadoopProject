@@ -24,7 +24,7 @@ import java.io.IOException;
  * @Date 2019/11/8
  * Job2：
  * 输入路径：训练集
- * 输出路径：自定义Job2输出路径，如：/OutPut/Job2/
+ * 输出路径：自定义Job2输出路径，如：/src/OutPut/Job2/
  * Mapper：
  * 输入：<文档名,整个文档>，输出：<文档类别，本文档中单词总数sum>
  * Reducer：
@@ -57,8 +57,7 @@ public class Job2 extends Configured implements Tool {
         job.setReducerClass(Job2Reducer.class);// 设置Reducer
         job.setNumReduceTasks(1);// 设置单个ReduceTask，确保输出文件只有一个，便于后面的Job进行读取
 
-        // TextOutputFormat 默认是Key是LongWritable类型，Value是Text类型
-        // 当自定义InputFormat时一定也要自定义Map输出键值对类型，否则会使用默认类型从而报错
+        // 默认使用的OutputFormat是TextOutputFormat，使用时一定要指定Map和Reduce输出的Key-Value类型
         // 设置Map输出Key Value类型
         job.setMapOutputKeyClass(Text.class);
         job.setMapOutputValueClass(IntWritable.class);
@@ -82,7 +81,7 @@ public class Job2 extends Configured implements Tool {
         public void map(Text KeyIn, BytesWritable ValueIn, Context context)
                 throws IOException, InterruptedException {
             // 对整个文档内容按回车、换行、空字符进行分割，分割产生的碎片数量即为本文档中单词总数
-            String[] contents = new String(ValueIn.copyBytes()).split("\r\n|\n|\r|\u0000+");
+            String[] contents = new String(ValueIn.copyBytes()).split("\r\n|\n|\r");
             // 本文档单词总数作为ValueOut
             VALUEOUT.set(contents.length);
 
@@ -104,10 +103,10 @@ public class Job2 extends Configured implements Tool {
         //不能使用combiner
         public void reduce(Text KeyIn, Iterable<IntWritable> ValuesIn, Context context)
                 throws IOException, InterruptedException {
-            // 本类别文档单词总数
-            int sumOfWords = 0;
-            // 本类别文档总数
-            int sumOfFiles = 0;
+
+            int sumOfWords = 0;// 本类别文档单词总数
+            int sumOfFiles = 0;// 本类别文档总数
+
             for (IntWritable value : ValuesIn) {
                 //每有一个value则有一个此类别文档
                 sumOfWords += value.get();
@@ -117,10 +116,9 @@ public class Job2 extends Configured implements Tool {
             String fileClass = KeyIn.toString();
             // 以制表符 \t 作为分隔符
             KEYOUT.set(fileClass + "\t" + sumOfWords);
-
             // ValueOut为本类文档个数
             VALUEOUT.set(sumOfFiles);
-
+            // 写入
             context.write(KEYOUT, VALUEOUT);
         }
     }

@@ -264,7 +264,7 @@ public class BayesTools {
         System.out.println("微平均评价指标：");
         System.out.println("Micro-Average Accuracy: " + microAccuracy);
         System.out.println("Micro-Average Precision: " + microPrecision);
-        System.out.println("Micro-Average Recall:" + microRecall);
+        System.out.println("Micro-Average Recall: " + microRecall);
         System.out.println("Micro-Average F1: " + microF1);
 
     }

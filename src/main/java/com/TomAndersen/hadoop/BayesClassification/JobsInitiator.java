@@ -16,13 +16,13 @@ public class JobsInitiator {
     public static final String Job1_OutputPath = "src/Output/Job1/";
     public static final String Job2_OutputPath = "src/Output/Job2/";
     public static final String Job3_OutputPath = "src/Output/Job3/";
-    public static final String Job4_OutputPath = "src/Output/Job4/";
+
 
     /*// 集群测试下的HDFS文件路径
     public static final String Job1_OutputPath = "/src/Output/Job1/";
     public static final String Job2_OutputPath = "/src/Output/Job2/";
     public static final String Job3_OutputPath = "/src/Output/Job3/";
-    public static final String Job4_OutputPath = "/src/Output/Job4/";*/
+    */
 
     public static void main(String[] args) throws Exception {
         // args中有两个参数，第一个为训练集，第二个为测试集

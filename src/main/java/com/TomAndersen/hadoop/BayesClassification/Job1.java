@@ -12,7 +12,6 @@ import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
-import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
@@ -58,8 +57,7 @@ public class Job1 extends Configured implements Tool {
         job.setCombinerClass(Job1Reducer.class);// 设置Combiner
         job.setReducerClass(Job1Reducer.class);// 设置Reducer
 
-        // TextOutputFormat 默认是Key是LongWritable类型，Value是Text类型
-        // 当自定义InputFormat时一定也要自定义Map输出键值对类型，否则会使用默认类型从而报错
+        // 默认使用的OutputFormat是TextOutputFormat，使用时一定要指定Map输出的Key-Value类型
         job.setMapOutputKeyClass(Text.class);
         job.setMapOutputValueClass(IntWritable.class);
 
@@ -85,9 +83,10 @@ public class Job1 extends Configured implements Tool {
                 throws IOException, InterruptedException {//KeyIn是文档名，ValueIn是文档内容
             // Text, BytesWritable, Text, IntWritable输入输出键值对类型
             // 将文档内容按照回车分割，即分割成一个个单词
-            String[]  contents = new String(ValueIn.copyBytes()).split("\r\n|\n|\t|\u0000+");
-            // 以各种系统的换行形式、制表符以及Unicode字符的null作为分隔符进行切分
+            String[] contents = new String(ValueIn.copyBytes()).split("\r\n|\n|\r");
+            // 以各种系统的换行形式以及Unicode字符的null作为分隔符进行切分
             // 不知道为什么原数据集中那么多Unicode的空
+            // （之前之所以产生了这么多Unicode空是因为读取BytesWritable时使用的是getBytes而非copyBytes，存在错误）
 
             /*// 也可以使用以下方式获取文件名，但这样就无法使用CombineInputFormat
             // 因为CombineFileSplit无法转换成FileSplit

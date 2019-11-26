@@ -258,7 +258,7 @@ public class BayesTools {
         System.out.println("宏平均评价指标：");
         System.out.println("Macro-Average Accuracy: " + macroAccuracy);
         System.out.println("Macro-Average Precision: " + macroPrecision);
-        System.out.println("Macro-Average Recall:" + macroRecall);
+        System.out.println("Macro-Average Recall: " + macroRecall);
         System.out.println("Macro-Average F1: " + macroF1);
 
         System.out.println("微平均评价指标：");
